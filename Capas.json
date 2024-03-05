@@ -1,0 +1,27 @@
+[
+    {
+        "id_capa": 0,
+        "pixeles": [
+            {
+            "fila": 25,
+            "columna": 31,
+            "color": "#FFCC33"
+            },
+            {
+            "fila": 38,
+            "columna": 31,
+            "color": "#FFCC40"
+            }
+        ]
+    },
+    {
+        "id_capa": 1,
+        "pixeles": [
+        {
+            "fila": 21,
+            "columna": 37,
+            "color": "#FFCC27"
+        }
+        ]
+    }
+]

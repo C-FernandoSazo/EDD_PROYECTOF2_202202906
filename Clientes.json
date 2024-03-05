@@ -1,0 +1,12 @@
+[
+    {
+        "dpi": "1234567890123",
+        "nombre_cliente" : "AUX_EDD",
+        "password" : "edd1s2024"
+    },
+    {
+        "dpi": "1234567890124",
+        "nombre_cliente" : "Farruko Pop",
+        "password" : "FP1234"  
+    }
+]
