@@ -1,4 +1,4 @@
-module moduleAdmin
+module moduleAC
   implicit none
 
 contains 
@@ -7,10 +7,10 @@ contains
     use lista_clientes
     use lecturaJson
     implicit none
-    Type(listaClientes) :: milistaClientes
+    Type(listaClientes), intent(inout) :: milistaClientes
     integer :: opcion
     do
-      print *, "--------Modulo Administrador--------"
+      print *, "---------Modulo Administrador---------"
       print *, "1. Arbol B de usuarios"
       print *, "2. Operaciones sobre los usuarios"
       print *, "3. Carga Masiva de Usuarios"
@@ -30,34 +30,31 @@ contains
           print *, "Selecciona algun valor que este en el menu"
       end select
     end do
-end subroutine moduloAdmin
+  end subroutine moduloAdmin
 
-end module moduleAdmin
-
-module moduleClient
-  implicit none
-
-contains 
-
-  subroutine moduloClient(client)
+  subroutine moduloClient(client, miArbolCapas)
+    use lecturaJson
     use lista_clientes
+    use Arbol_Capas
     implicit none
     type(Cliente), intent(inout) :: client
+    type(ArbolCapas), intent(inout) :: miArbolCapas
     integer :: opcion
     do
-      print *, "--------Modulo Cliente--------"
+      print *, "---------Modulo Cliente---------"
       print *, "1. Reportes de las estructuras"
-      print *, "2. Navegacion y gestión de imagenes"
+      print *, "2. Navegacion y gestion de imagenes"
       print *, "3. Carga Masiva de archivos"
       print *, "4. Regresar"
       read (*,*) opcion
       select case(opcion)
         case(1)
-
+          call miArbolCapas%graficarABB()
         case(2)
 
         case(3)
-
+          call leerCapas(miArbolCapas,"C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Capas.json")
+          call miArbolCapas%imprimirEnOrden()
         case(4)
           exit
         case default
@@ -66,21 +63,22 @@ contains
     end do
   end subroutine moduloClient
 
-end module moduleClient
+end module moduleAC
 
 program main
-  use moduleAdmin
-  use moduleClient
+  use moduleAC
   use lista_clientes
+  use Arbol_Capas
   implicit none
   Type(listaClientes) :: milistaClientes
   Type(Cliente) :: clienteTemp
+  type(ArbolCapas) :: miArbolCapas
   integer :: opcion
   character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
 
   do
-    print *, "--------Menu Principal--------"
-    print *, "1. Inicio de Sesión"
+    print *, "---------Menu Principal---------"
+    print *, "1. Inicio de Sesion"
     print *, "2. Registro de Usuarios"
     print *, "3. Salida"
     read (*,*) opcion
@@ -94,7 +92,7 @@ program main
         if (loginNombre == "admin" .and. loginPass == "EDD2024") then
           call moduloAdmin(milistaClientes)
         else if (clienteTemp%nombre /= "0") then
-          call moduloClient(clienteTemp)
+          call moduloClient(clienteTemp,miArbolCapas)
         else 
           print *,"Usuario/Contrasena erronea"
         end if
