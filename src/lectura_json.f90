@@ -141,4 +141,63 @@ contains
         call json%destroy()
     end subroutine leerCapas
 
+    subroutine leerImagenes(filename)
+        use Arbol_Capas
+        use Arbol_Imagenes
+        character(len=*), intent(in) :: filename
+        type(json_file) :: json
+        type(json_core) :: jCore
+        type(json_value), pointer :: pJsonArray, pJsonValue, pPixelsArray, pPixelValue, attributePointer
+        type(matrizDispersa) :: matrizTemp
+        integer :: i, j, nCapas, nImagenes, fila, columna, id, valor
+        character(len=:), allocatable :: colorTemp
+        logical :: found
+
+        ! Inicializar la biblioteca JSON
+        call json%initialize()
+        call json%load_file(filename)
+        call json%info('', n_children=nImagenes)
+
+        ! Obtener el objeto json_core asociado con el archivo json actualmente abierto
+        call json%get_core(jCore)
+
+        ! Obtener el puntero al array JSON principal (capas)
+        call json%get('', pJsonArray, found)
+        if (.not. found) then
+            print *, "Error: El archivo JSON no contiene un objeto."
+            call json%destroy()
+            return
+        end if
+
+        ! Recorrer cada capa
+        do i = 1, nImagenes
+            call jCore%get_child(pJsonArray, i, pJsonValue, found=found)
+            if (found) then
+                ! Extraer el id_capa
+                call jCore%get_child(pJsonValue, 'id', attributePointer, found=found)
+                if (found) then
+                    call jCore%get(attributePointer, id)
+                    write(*,*) "Estamos en id: ",id
+                end if
+                ! Extraer el arreglo de pixeles
+                call jCore%get_child(pJsonValue, 'capas', pPixelsArray, found=found)
+                if (found) then
+                    call jCore%info(pPixelsArray, n_children=nCapas)
+                    ! Recorrer cada valor del arreglo
+                    do j = 1, nCapas
+                        print *, "ENTRO A CAPAS"
+                        call jCore%get_child(pPixelsArray, j, pPixelValue, found=found)
+                        if (found) then
+                            call jCore%get(pPixelValue, valor)
+                            write(*,*) valor
+                        end if
+                    end do
+                end if
+            end if
+        end do
+
+        ! Finalizar la biblioteca JSON
+        call json%destroy()
+    end subroutine leerImagenes
+
 end module lecturaJson

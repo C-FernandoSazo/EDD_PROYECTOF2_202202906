@@ -22,7 +22,8 @@ contains
         case(2)
 
         case(3)
-          call leerClientes(milistaClientes,"C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Clientes.json")
+          call leerClientes(milistaClientes, &
+          "C:\Users\Fernando\OneDrive\Documentos\Programas\EDD_PROYECTOF2_202202906\Clientes.json")
           print *, "Se han agregado los clientes correctamente"
         case(4)
           exit
@@ -53,8 +54,10 @@ contains
         case(2)
 
         case(3)
-          call leerCapas(miArbolCapas,"C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Capas.json")
+          call leerCapas(miArbolCapas, &
+          "C:\Users\Fernando\OneDrive\Documentos\Programas\EDD_PROYECTOF2_202202906\Capas.json")
           call miArbolCapas%imprimirEnOrden()
+          call miArbolCapas%graficarABB()
         case(4)
           exit
         case default
@@ -69,6 +72,7 @@ program main
   use moduleAC
   use lista_clientes
   use Arbol_Capas
+  use lecturaJson
   implicit none
   Type(listaClientes) :: milistaClientes
   Type(Cliente) :: clienteTemp
@@ -76,6 +80,7 @@ program main
   integer :: opcion
   character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
 
+  call leerImagenes("C:\Users\Fernando\OneDrive\Documentos\Programas\EDD_PROYECTOF2_202202906\Imagenes.json")
   do
     print *, "---------Menu Principal---------"
     print *, "1. Inicio de Sesion"

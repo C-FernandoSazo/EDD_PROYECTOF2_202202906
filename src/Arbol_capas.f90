@@ -106,6 +106,7 @@ module Arbol_Capas
             procedure :: insertarNodo
             procedure :: imprimirEnOrden
             procedure :: graficarABB
+            procedure :: buscarNodo
     end type ArbolCapas
 
 contains 
@@ -216,6 +217,40 @@ contains
             call escribirNodoRecursivo(nodo%right, unitNum)
         end if
     end subroutine escribirNodoRecursivo
+
+    ! Función para buscar un nodo por su clave
+    function buscarNodo(arbol, key) result(nodoEncontrado)
+        class(ArbolCapas), intent(in) :: arbol
+        integer, intent(in) :: key
+        type(NodoCapa), pointer :: nodoEncontrado
+
+        nodoEncontrado => null()  
+        
+        if (associated(arbol%raiz)) then
+            call buscarRecursivo(arbol%raiz, key, nodoEncontrado)
+        end if
+    end function buscarNodo
+
+    ! Subrutina recursiva para buscar un nodo
+    recursive subroutine buscarRecursivo(nodo, key, nodoEncontrado)
+        type(NodoCapa), pointer, intent(in) :: nodo
+        integer, intent(in) :: key
+        type(NodoCapa), pointer, intent(inout) :: nodoEncontrado
+
+        if (.not. associated(nodo)) then
+            return 
+        end if
+        ! Comparacion de id
+        if (key == nodo%key) then
+            nodoEncontrado => nodo
+        ! Si el id buscado es menor al del nodo actual significa que estara en el subarbol izquierdo 
+        else if (key < nodo%key) then
+            call buscarRecursivo(nodo%left, key, nodoEncontrado)  ! Buscar en el subárbol izquierdo
+        else
+        ! Si el id buscado es mayor al del nodo actual significa que estara en el subarbol derecho
+            call buscarRecursivo(nodo%right, key, nodoEncontrado)  ! Buscar en el subárbol derecho
+        end if
+    end subroutine buscarRecursivo
 
 
 end module Arbol_Capas
