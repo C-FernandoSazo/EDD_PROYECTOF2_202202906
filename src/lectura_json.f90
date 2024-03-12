@@ -1,6 +1,8 @@
 module lecturaJson
     use json_module
     use lista_clientes
+    use matriz_dispersa
+    use Arbol_Capas
     implicit none
 contains
 
@@ -61,8 +63,6 @@ contains
     end subroutine leerClientes
 
     subroutine leerCapas(arbol, filename)
-        use Arbol_Capas
-        use matriz_dispersa
         type(ArbolCapas), intent(inout) :: arbol
         character(len=*), intent(in) :: filename
         type(json_file) :: json
@@ -98,14 +98,14 @@ contains
                 call jCore%get_child(pJsonValue, 'id_capa', attributePointer, found=found)
                 if (found) then
                     call jCore%get(attributePointer, key)
+                    call arbol%insertarNodo(key)
                 end if
                 write(*,*) key
                 ! Extraer el arreglo de pixeles
-                call matrizTemp%vaciarMatrix()
                 call jCore%get_child(pJsonValue, 'pixeles', pPixelsArray, found=found)
                 if (found) then
                     call jCore%info(pPixelsArray, n_children=nPixeles)
-                    ! Recorrer cada pixel en la capa
+                    write (*,*) "NPIXELES: ", nPixeles
                     do j = 1, nPixeles
                         print *, "ENTRO A PIXELES"
                         call jCore%get_child(pPixelsArray, j, pPixelValue, found=found)
@@ -129,11 +129,12 @@ contains
                                 color = colorTemp
                                 write(*,*) color
                             end if
-                            call matrizTemp%add(fila,columna,color)
+                            call arbol%ingresarMatriz(key,fila,columna,color)
                         end if
                     end do
                 end if
-                call arbol%insertarNodo(key,matrizTemp)
+                print *,"Mostrando arbol"
+                call arbol%imprimirEnOrden()
             end if
         end do
 
@@ -141,17 +142,21 @@ contains
         call json%destroy()
     end subroutine leerCapas
 
-    subroutine leerImagenes(filename)
-        use Arbol_Capas
+    subroutine leerImagenes(arbol, miArbolCapas, filename)
         use Arbol_Imagenes
+        type(ArbolImagenes), intent(inout) :: arbol
         character(len=*), intent(in) :: filename
+        type(ArbolCapas), intent(inout) :: miArbolCapas
+        type(Capa) :: capaTemp
         type(json_file) :: json
         type(json_core) :: jCore
-        type(json_value), pointer :: pJsonArray, pJsonValue, pPixelsArray, pPixelValue, attributePointer
-        type(matrizDispersa) :: matrizTemp
-        integer :: i, j, nCapas, nImagenes, fila, columna, id, valor
+        type(json_value), pointer :: pJsonArray, pJsonValue, pCapasArray, CapaValue, attributePointer
+        integer :: i, j, nCapas, nImagenes, id, valor
         character(len=:), allocatable :: colorTemp
         logical :: found
+
+        print *, "METODO LEER IMAGENES"
+        call miArbolCapas%imprimirEnOrden()
 
         ! Inicializar la biblioteca JSON
         call json%initialize()
@@ -169,30 +174,35 @@ contains
             return
         end if
 
-        ! Recorrer cada capa
+        print *, "ENTRAMOS AL CICLO PRINCIPAL"
         do i = 1, nImagenes
             call jCore%get_child(pJsonArray, i, pJsonValue, found=found)
             if (found) then
-                ! Extraer el id_capa
                 call jCore%get_child(pJsonValue, 'id', attributePointer, found=found)
                 if (found) then
                     call jCore%get(attributePointer, id)
-                    write(*,*) "Estamos en id: ",id
+                    write(*,'(A,I0)') "ESTE ES EL ID: ",id
+                    call arbol%insertar(id)
                 end if
-                ! Extraer el arreglo de pixeles
-                call jCore%get_child(pJsonValue, 'capas', pPixelsArray, found=found)
+                print *, "EXTRAYENDO CAPAS"
+                call jCore%get_child(pJsonValue, 'capas', pCapasArray, found=found)
                 if (found) then
-                    call jCore%info(pPixelsArray, n_children=nCapas)
-                    ! Recorrer cada valor del arreglo
+                    call jCore%info(pCapasArray, n_children=nCapas)
                     do j = 1, nCapas
-                        print *, "ENTRO A CAPAS"
-                        call jCore%get_child(pPixelsArray, j, pPixelValue, found=found)
+                        call jCore%get_child(pCapasArray, j,  CapaValue, found=found)
                         if (found) then
-                            call jCore%get(pPixelValue, valor)
-                            write(*,*) valor
+                            call jCore%get(CapaValue, valor)
+                            write(*,'(A,I0)') "CAPA: ", valor
+                            print *,"ENCONTRADO LA MATRIZ"
+                            capaTemp = miArbolCapas%buscarNodo(valor)
+                            call capaTemp%matriz%mostrarMatriz()
+                            print *,"MATRIZ ENCONTRADA"
+                            call arbol%ingresarCapas(id,capaTemp%key,capaTemp%matriz)         
                         end if
-                    end do
+                    end do 
                 end if
+                print*,"AHORA AL ARBOL"
+                print*,"AHORA SALIO Y TERMINO DE GUARDAR"
             end if
         end do
 

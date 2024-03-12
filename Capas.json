@@ -3,13 +3,13 @@
         "id_capa": 7,
         "pixeles": [
             {
-            "fila": 25,
-            "columna": 31,
+            "fila": 7,
+            "columna": 7,
             "color": "#FFCC33"
             },
             {
-            "fila": 38,
-            "columna": 31,
+            "fila": 6,
+            "columna": 6,
             "color": "#FFCC40"
             }
         ]
@@ -18,8 +18,8 @@
         "id_capa": 3,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 3,
+            "columna": 3,
             "color": "#FFCC27"
         }
         ]
@@ -28,8 +28,8 @@
         "id_capa": 5,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 5,
+            "columna": 5,
             "color": "#FFCC27"
         }
         ]
@@ -38,8 +38,8 @@
         "id_capa": 8,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 8,
+            "columna": 8,
             "color": "#FFCC27"
         }
         ]
@@ -48,8 +48,8 @@
         "id_capa": 9,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 9,
+            "columna": 9,
             "color": "#FFCC27"
         }
         ]
@@ -58,8 +58,8 @@
         "id_capa": 4,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 4,
+            "columna": 4,
             "color": "#FFCC27"
         }
         ]
@@ -68,8 +68,8 @@
         "id_capa": 1,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 1,
+            "columna": 1,
             "color": "#FFCC27"
         }
         ]
@@ -78,8 +78,8 @@
         "id_capa": 6,
         "pixeles": [
         {
-            "fila": 21,
-            "columna": 37,
+            "fila": 6,
+            "columna": 6,
             "color": "#FFCC27"
         }
         ]

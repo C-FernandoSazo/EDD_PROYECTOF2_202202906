@@ -1,16 +1,18 @@
 module lista_clientes
     implicit none
 
-    type, public :: Cliente 
+    type:: Cliente 
         character(len=20) :: nombre, password, dpi
     end type Cliente
 
-    type, public :: NodoCliente
+    type:: NodoCliente
+        private
         type(Cliente) :: cliente
         type(NodoCliente), pointer :: siguiente => null()
     end type NodoCliente
 
-    type, public :: listaClientes
+    type:: listaClientes
+        private
         type(NodoCliente), pointer :: head => null()
         contains
             procedure :: agregarCliente
