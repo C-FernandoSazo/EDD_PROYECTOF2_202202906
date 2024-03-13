@@ -20,10 +20,14 @@ module Arbol_Capas
             procedure :: insertarNodo
             procedure :: insertarNodoConMatriz
             procedure :: imprimirEnOrden
-            procedure :: graficarABB
             procedure :: vaciarArbol
+            procedure :: graficarABB
             procedure :: buscarNodo
             procedure :: ingresarMatriz
+            procedure :: preorder
+            procedure :: inorder
+            procedure :: postorder
+            procedure :: calcularProfundidad
     end type ArbolCapas
 
 contains 
@@ -243,4 +247,59 @@ contains
         end if
     end subroutine  matrizRecusrivo
 
+    subroutine preorder(this, tmp)
+        class(ArbolCapas), intent(in) :: this
+        type(NodoCapa), intent(in), pointer :: tmp
+        if( .not. associated(tmp)) then
+            return
+        end if
+        write (*, '(A,I0)', advance='no') ' Capa: ',tmp%capa%key
+        call this%preorder(tmp%left)
+        call this%preorder(tmp%right)
+    end subroutine preorder
+
+    subroutine inorder(this, tmp)
+        class(ArbolCapas), intent(in) :: this
+        type(NodoCapa), intent(in), pointer :: tmp
+        if( .not. associated(tmp)) then
+            return
+        end if
+        call this%inorder(tmp%left)
+        write (*, '(A,I0)', advance='no') ' Capa: ',tmp%capa%key
+        call this%inorder(tmp%right)
+    end subroutine inorder
+
+    subroutine postorder(this, tmp)
+        class(ArbolCapas), intent(in) :: this
+        type(NodoCapa), intent(in), pointer :: tmp
+        if( .not. associated(tmp)) then
+            return
+        end if
+        call this%postorder(tmp%left)
+        call this%postorder(tmp%right)
+        write (*, '(A,I0)', advance='no') ' Capa: ',tmp%capa%key
+    end subroutine postorder
+
+    subroutine calcularProfundidad(arbol)
+        class(ArbolCapas), intent(in) :: arbol
+        integer :: profundidad
+    
+        profundidad = profundidadRecursiva(arbol%raiz)
+        write(*,'(A,I0)') "Profundidad del arbol: ",profundidad
+    end subroutine calcularProfundidad
+    
+    recursive function profundidadRecursiva(nodo) result(profundidadNodo)
+        type(NodoCapa), pointer, intent(in) :: nodo
+        integer :: profundidadIzquierda, profundidadDerecha, profundidadNodo
+    
+        if (.not. associated(nodo)) then
+            profundidadNodo = 0
+            return
+        end if
+
+        profundidadIzquierda = profundidadRecursiva(nodo%left)
+        profundidadDerecha = profundidadRecursiva(nodo%right)
+        profundidadNodo = 1 + max(profundidadIzquierda, profundidadDerecha)
+    end function profundidadRecursiva
+    
 end module Arbol_Capas

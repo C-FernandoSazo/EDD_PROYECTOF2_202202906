@@ -3,12 +3,14 @@ program main
   use lista_clientes
   use Arbol_Capas
   use Arbol_Imagenes
+  use listaAlbum
   implicit none
   Type(listaClientes) :: milistaClientes
   Type(Cliente) :: clienteTemp
   type(ArbolCapas) :: miArbolCapas
   type(ArbolImagenes) :: miArbolImg
-  integer :: opcion, opcionAdmin, opcionClient
+  type(lista_album) :: miListaAlbum
+  integer :: opcion, opcionAdmin, opcionClient, opcionReportClient
   character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
 
   do
@@ -54,10 +56,11 @@ program main
           ! INTERFAZ DE CLIENTE
           do
             print *, "---------Modulo Cliente---------"
-            print *, "1. Reportes de las estructuras"
+            print *, "1. Estado de las estructuras"
             print *, "2. Navegacion y gestion de imagenes"
             print *, "3. Carga Masiva de archivos"
-            print *, "4. Regresar"
+            print *, "4. Reportes de Usuario"
+            print *, "5. Regresar"
             read (*,*) opcionClient
             select case(opcionClient)
               case(1)
@@ -78,7 +81,36 @@ program main
                 call miArbolImg%imprimirArbolImg()
                 print *, "\nCORROBORANDO ARBOL CAPAS ORIGINLA: "
                 call miArbolCapas%imprimirEnOrden()
+                call leerAlbumes(miListaAlbum,"C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Albumes.json")
+                call miListaAlbum%mostrarAlbum()
               case(4)
+                do
+                  print *, "1. Top 5 de imagenes con mas numero de capas"
+                  print *, "2. Todas las capas que son hojas"
+                  print *, "3. Profundidad de arbol de capas"
+                  print *, "4. Listar las capas en: preorden, inorden, postorden"
+                  print *, "5. Regresar"
+                  read (*,*) opcionReportClient
+                  select case(opcionReportClient)
+                    case(1)
+                    case(2)
+                    case(3)
+                      call miArbolCapas%calcularProfundidad()
+                    case(4)
+                      print *, "Recorrido Preorder"
+                      call miArbolCapas%preorder(miArbolCapas%raiz)
+                      print *,""
+                      print *, "Recorrido Inorder"
+                      call miArbolCapas%inorder(miArbolCapas%raiz)
+                      print *,""
+                      print *, "Recorrido Postorder"
+                      call miArbolCapas%postorder(miArbolCapas%raiz)
+                      print *,""
+                    case(5)
+                      exit
+                  end select
+                end do
+              case(5)
                 exit
               case default
                 print *, "Selecciona algun valor que este en el menu"

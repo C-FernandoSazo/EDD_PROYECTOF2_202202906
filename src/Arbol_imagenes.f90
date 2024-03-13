@@ -63,10 +63,8 @@ contains
             print *, "Se agrego correctamente"
             if ((this%getAltura(temp%left) - this%getAltura(temp%right)) == 2) then
                 if (id < temp%left%id) then
-                    print *, "Rotacion simple por la izquierda"
                     temp => this%rsi(temp)
                 else 
-                    print *, "Rotacion doble por la izquierda"
                     temp => this%rdi(temp)
                 end if
             end if
@@ -76,10 +74,8 @@ contains
             print *, "Se agrego correctamente"
             if ((this%getAltura(temp%right) - this%getAltura(temp%left)) == 2) then
                 if (id > temp%right%id) then
-                    print *, "Rotacion simple por la derecha"
                     temp => this%rsd(temp)
                 else 
-                    print *, "Rotacion doble por la derecha"
                     temp => this%rdd(temp)
                 end if
             end if

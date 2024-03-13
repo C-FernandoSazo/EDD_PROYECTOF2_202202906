@@ -133,8 +133,6 @@ contains
                         end if
                     end do
                 end if
-                print *,"Mostrando arbol"
-                call arbol%imprimirEnOrden()
             end if
         end do
 
@@ -152,11 +150,7 @@ contains
         type(json_core) :: jCore
         type(json_value), pointer :: pJsonArray, pJsonValue, pCapasArray, CapaValue, attributePointer
         integer :: i, j, nCapas, nImagenes, id, valor
-        character(len=:), allocatable :: colorTemp
         logical :: found
-
-        print *, "METODO LEER IMAGENES"
-        call miArbolCapas%imprimirEnOrden()
 
         ! Inicializar la biblioteca JSON
         call json%initialize()
@@ -174,7 +168,6 @@ contains
             return
         end if
 
-        print *, "ENTRAMOS AL CICLO PRINCIPAL"
         do i = 1, nImagenes
             call jCore%get_child(pJsonArray, i, pJsonValue, found=found)
             if (found) then
@@ -201,13 +194,67 @@ contains
                         end if
                     end do 
                 end if
-                print*,"AHORA AL ARBOL"
-                print*,"AHORA SALIO Y TERMINO DE GUARDAR"
             end if
         end do
 
         ! Finalizar la biblioteca JSON
         call json%destroy()
     end subroutine leerImagenes
+
+    subroutine leerAlbumes(miListaAlbum, filename)
+        use listaAlbum
+        type(lista_album), intent(inout) :: miListaAlbum
+        character(len=*), intent(in) :: filename
+        type(json_file) :: json
+        type(json_core) :: jCore
+        type(json_value), pointer :: pJsonArray, pJsonValue, pImgsArray, ImgValue, attributePointer
+        integer :: i, j, nImgs, nAlbumes, valor
+        character(len=:), allocatable :: albumTemp
+        character(len=10) :: album
+        logical :: found
+
+        ! Inicializar la biblioteca JSON
+        call json%initialize()
+        call json%load_file(filename)
+        call json%info('', n_children=nAlbumes)
+
+        ! Obtener el objeto json_core asociado con el archivo json actualmente abierto
+        call json%get_core(jCore)
+
+        ! Obtener el puntero al array JSON principal (capas)
+        call json%get('', pJsonArray, found)
+        if (.not. found) then
+            print *, "Error: El archivo JSON no contiene un objeto."
+            call json%destroy()
+            return
+        end if
+
+        do i = 1, nAlbumes
+            call jCore%get_child(pJsonArray, i, pJsonValue, found=found)
+            if (found) then
+                call jCore%get_child(pJsonValue, 'nombre_album', attributePointer, found=found)
+                if (found) then
+                    call jCore%get(attributePointer, albumTemp)
+                    album = albumTemp
+                    call miListaAlbum%agregarAlbum(album)
+                end if
+                print *, "EXTRAYENDO IMAGENES"
+                call jCore%get_child(pJsonValue, 'imgs', pImgsArray, found=found)
+                if (found) then
+                    call jCore%info(pImgsArray, n_children=nImgs)
+                    do j = 1, nImgs
+                        call jCore%get_child(pImgsArray, j,  ImgValue, found=found)
+                        if (found) then
+                            call jCore%get(ImgValue, valor)
+                            call miListaAlbum%addImagen(album,valor)
+                        end if
+                    end do 
+                end if
+            end if
+        end do
+
+        ! Finalizar la biblioteca JSON
+        call json%destroy()
+    end subroutine leerAlbumes
 
 end module lecturaJson
