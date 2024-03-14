@@ -47,11 +47,96 @@
     {
         "id_capa": 9,
         "pixeles": [
-        {
-            "fila": 9,
-            "columna": 9,
-            "color": "#FFCC27"
-        }
+            {
+                "fila": 1,
+                "columna": 1,
+                "color": "#FF0000" 
+            },
+            {
+                "fila": 2,
+                "columna": 2,
+                "color": "#FF7F00" 
+            },
+            {
+                "fila": 3,
+                "columna": 3,
+                "color": "#FFFF00" 
+            },
+            {
+                "fila": 4,
+                "columna": 4,
+                "color": "#00FF00" 
+            },
+            {
+                "fila": 5,
+                "columna": 5,
+                "color": "#0000FF" 
+            },
+            {
+                "fila": 6,
+                "columna": 6,
+                "color": "#4B0082"  
+            },
+            {
+                "fila": 7,
+                "columna": 7,
+                "color": "#9400D3"  
+            },
+            {
+                "fila": 8,
+                "columna": 8,
+                "color": "#FF0000" 
+            },
+            {
+                "fila": 9,
+                "columna": 9,
+                "color": "#FF7F00"  
+            },
+            {
+                "fila": 1,
+                "columna": 9,
+                "color": "#FFFF00"  
+            },
+            {
+                "fila": 2,
+                "columna": 8,
+                "color": "#00FF00" 
+            },
+            {
+                "fila": 3,
+                "columna": 7,
+                "color": "#0000FF"  
+            },
+            {
+                "fila": 4,
+                "columna": 6,
+                "color": "#4B0082" 
+            },
+            {
+                "fila": 5,
+                "columna": 5,
+                "color": "#9400D3"  
+            },
+            {
+                "fila": 6,
+                "columna": 4,
+                "color": "#FF0000" 
+            },
+            {
+                "fila": 7,
+                "columna": 3,
+                "color": "#FF7F00"  
+            },
+            {
+                "fila": 8,
+                "columna": 2,
+                "color": "#FFFF00" 
+            },
+            {
+                "fila": 9,
+                "columna": 1,
+                "color": "#00FF00" 
+            }
         ]
     },
     {
@@ -67,11 +152,96 @@
     {
         "id_capa": 1,
         "pixeles": [
-        {
-            "fila": 1,
-            "columna": 1,
-            "color": "#FFCC27"
-        }
+            {
+                "fila": 1,
+                "columna": 1,
+                "color": "#FF0000" 
+            },
+            {
+                "fila": 2,
+                "columna": 2,
+                "color": "#FF7F00" 
+            },
+            {
+                "fila": 6,
+                "columna": 3,
+                "color": "#FFFF00" 
+            },
+            {
+                "fila": 4,
+                "columna": 4,
+                "color": "#00FF00" 
+            },
+            {
+                "fila": 8,
+                "columna": 5,
+                "color": "#0000FF" 
+            },
+            {
+                "fila": 6,
+                "columna": 1,
+                "color": "#4B0082"  
+            },
+            {
+                "fila": 6,
+                "columna": 4,
+                "color": "#9400D3"  
+            },
+            {
+                "fila": 8,
+                "columna": 8,
+                "color": "#FF0000" 
+            },
+            {
+                "fila": 9,
+                "columna": 9,
+                "color": "#FF7F00"  
+            },
+            {
+                "fila": 1,
+                "columna": 9,
+                "color": "#FFFF00"  
+            },
+            {
+                "fila": 2,
+                "columna": 8,
+                "color": "#00FF00" 
+            },
+            {
+                "fila": 3,
+                "columna": 7,
+                "color": "#0000FF"  
+            },
+            {
+                "fila": 4,
+                "columna": 6,
+                "color": "#4B0082" 
+            },
+            {
+                "fila": 5,
+                "columna": 5,
+                "color": "#9400D3"  
+            },
+            {
+                "fila": 6,
+                "columna": 4,
+                "color": "#FF0000" 
+            },
+            {
+                "fila": 7,
+                "columna": 3,
+                "color": "#FF7F00"  
+            },
+            {
+                "fila": 8,
+                "columna": 2,
+                "color": "#FFFF00" 
+            },
+            {
+                "fila": 9,
+                "columna": 1,
+                "color": "#00FF00" 
+            }
         ]
     },
     {

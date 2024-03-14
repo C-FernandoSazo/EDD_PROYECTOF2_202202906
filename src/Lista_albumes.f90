@@ -66,6 +66,7 @@ module listaAlbum
             procedure :: agregarAlbum
             procedure :: addImagen
             procedure :: mostrarAlbum
+            procedure :: graficar_albums
     end type lista_album
 
 contains 
@@ -117,5 +118,68 @@ contains
             actual => actual%siguiente
         end do
     end subroutine mostrarAlbum
+
+    subroutine graficar_albums(lista)
+        class(lista_album), intent(in) :: lista
+        character(len=15) :: filename = "lista_album"
+        type(NodoAlbum), pointer :: nodoActual
+        type(NodoLimagen), pointer :: nodoImgActual
+        integer :: fileUnit, iostat, contador, contadorImg
+        character(len=256) :: dotPath, pngPath
+
+        dotPath = 'dot/' // trim(filename) // '.dot'
+        pngPath = 'img/' // trim(adjustl(filename))
+    
+        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
+        if (iostat /= 0) then
+            print *, "Error al abrir el archivo."
+            return
+        end if
+    
+        write(fileUnit, *) "digraph albums {"
+        write(fileUnit, *) "    rankdir=LR;"
+        write(fileUnit, *) "    node [shape=record];"
+    
+        if (.not. associated(lista%head)) then
+            write(fileUnit,*) '}'
+            close(fileUnit)
+            return
+        end if
+    
+        nodoActual => lista%head
+        contador = 0
+        do while(associated(nodoActual))
+            contador = contador + 1
+            write(fileUnit, *) '"Node', contador, '" [label="', trim(nodoActual%id), '"];'
+
+            nodoImgActual => nodoActual%listImagenes%head
+            contadorImg = 0
+            do while(associated(nodoImgActual))
+                contadorImg = contadorImg + 1
+                write(fileUnit, *) '"Node', contador, 'Img', contadorImg, '" [label=" Imagen: ', nodoImgActual%id, '"];'
+                if (contadorImg == 1) then
+                    write(fileUnit, *) '"Node', contador, '" -> "Node', contador, 'Img', contadorImg, '" [color=green];'
+                end if
+                if (associated(nodoImgActual%siguiente)) then
+                    write(fileUnit, *) '"Node', contador, 'Img', contadorImg, '" -> "Node', contador, 'Img', & 
+                    contadorImg+1, '" [color=green];'
+                end if
+                nodoImgActual => nodoImgActual%siguiente
+            end do
+
+            ! Conexión al siguiente nodo si no es el mismo
+            if (associated(nodoActual%siguiente)) then
+                write(fileUnit,*) '    "Node', contador, '" -> "Node', contador+1, '" [color=blue];'
+                write(fileUnit,*) '    "Node', contador+1, '" -> "Node', contador, '" [color=red];'
+            end if
+    
+            nodoActual => nodoActual%siguiente
+        end do
+    
+        write(fileUnit, *) "}"    
+        close(fileUnit)
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
+        print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.png'
+    end subroutine graficar_albums
 
 end module listaAlbum

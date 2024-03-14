@@ -1,5 +1,5 @@
-module Arbol_Capas
-    use matriz_dispersa
+module Arbol_Capa
+    use matriz_Dispersass
     implicit none
     ! Arbol Binario de Busqueda ABB
 
@@ -20,7 +20,6 @@ module Arbol_Capas
             procedure :: insertarNodo
             procedure :: insertarNodoConMatriz
             procedure :: imprimirEnOrden
-            procedure :: vaciarArbol
             procedure :: graficarABB
             procedure :: buscarNodo
             procedure :: ingresarMatriz
@@ -28,6 +27,7 @@ module Arbol_Capas
             procedure :: inorder
             procedure :: postorder
             procedure :: calcularProfundidad
+            procedure :: imprimirHojas
     end type ArbolCapas
 
 contains 
@@ -121,10 +121,14 @@ contains
 
     subroutine graficarABB(arbol)
         class(ArbolCapas), intent(in) :: arbol
-        character(len=12) :: filename = "arbolABB.dot"
+        character(len=12) :: filename = "arbolABB"
         integer :: fileUnit, iostat
+        character(len=256) :: dotPath, pngPath
 
-        open(newunit=fileUnit, file=filename, status='replace', iostat=iostat)
+        dotPath = 'dot/' // trim(filename) // '.dot'
+        pngPath = 'img/' // trim(adjustl(filename))
+
+        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
         if (iostat /= 0) then
             print *, "Error al abrir el archivo."
             return
@@ -136,7 +140,7 @@ contains
         end if
         write(fileunit,*) '}'
         close(fileUnit)
-        call system('dot -Tpng ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.png')   
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
     end subroutine graficarABB
 
     recursive subroutine escribirNodoRecursivo(nodo, unitNum)
@@ -158,27 +162,6 @@ contains
             call escribirNodoRecursivo(nodo%right, unitNum)
         end if
     end subroutine escribirNodoRecursivo
-
-        
-    subroutine vaciarArbol(arbol)
-        class(ArbolCapas), intent(inout) :: arbol
-        if (associated(arbol%raiz)) then
-            call vaciarNodosRecursivo(arbol%raiz)
-            arbol%raiz => null()  ! Asegurar que la raíz del árbol apunte a null después de vaciar el árbol
-        end if
-        print *, "VACIAMOS EL ARBOL"
-    end subroutine vaciarArbol
-    
-    recursive subroutine vaciarNodosRecursivo(nodo)
-        type(NodoCapa), pointer, intent(inout) :: nodo
-        if (.not. associated(nodo)) return
-        ! Recursivamente vaciar el subárbol izquierdo
-        call vaciarNodosRecursivo(nodo%left)
-        ! Recursivamente vaciar el subárbol derecho
-        call vaciarNodosRecursivo(nodo%right)
-        ! Liberar el nodo actual
-        deallocate(nodo)
-    end subroutine vaciarNodosRecursivo
 
     ! Función para buscar un nodo por su clave
     function buscarNodo(arbol, key) result(capaEncontrada)
@@ -301,5 +284,25 @@ contains
         profundidadDerecha = profundidadRecursiva(nodo%right)
         profundidadNodo = 1 + max(profundidadIzquierda, profundidadDerecha)
     end function profundidadRecursiva
+
+    subroutine imprimirHojas(arbol)
+        class(ArbolCapas), intent(in) :: arbol
+        if (associated(arbol%raiz)) then
+            call imprimirHojasRecursivo(arbol%raiz)
+        end if
+    end subroutine imprimirHojas
     
-end module Arbol_Capas
+    recursive subroutine imprimirHojasRecursivo(nodo)
+        type(NodoCapa), pointer, intent(in) :: nodo
+        if (.not. associated(nodo)) return
+        ! Si ambos hijos son nulos, el nodo es una hoja
+        if (.not. associated(nodo%left) .and. .not. associated(nodo%right)) then
+            print *, "Nodo hoja con clave:", nodo%capa%key
+        else
+            ! Si no, sigue buscando en los hijos
+            if (associated(nodo%left)) call imprimirHojasRecursivo(nodo%left)
+            if (associated(nodo%right)) call imprimirHojasRecursivo(nodo%right)
+        end if
+    end subroutine imprimirHojasRecursivo
+    
+end module Arbol_Capa

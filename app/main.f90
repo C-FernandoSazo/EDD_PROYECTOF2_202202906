@@ -1,7 +1,7 @@
 program main
   use lecturaJson
   use lista_clientes
-  use Arbol_Capas
+  use Arbol_Capa
   use Arbol_Imagenes
   use listaAlbum
   implicit none
@@ -66,6 +66,8 @@ program main
               case(1)
                 call miArbolCapas%graficarABB()
                 call miArbolImg%graficarAVL()
+                call miListaAlbum%graficar_albums()
+                call miArbolCapas%raiz%capa%matriz%graficarMatrizDispersa()
               case(2)
       
               case(3)
@@ -94,6 +96,7 @@ program main
                   select case(opcionReportClient)
                     case(1)
                     case(2)
+                      call miArbolCapas%imprimirHojas()
                     case(3)
                       call miArbolCapas%calcularProfundidad()
                     case(4)

@@ -1,8 +1,8 @@
 module lecturaJson
     use json_module
     use lista_clientes
-    use matriz_dispersa
-    use Arbol_Capas
+    use matriz_Dispersass
+    use Arbol_Capa
     implicit none
 contains
 
@@ -188,7 +188,6 @@ contains
                             write(*,'(A,I0)') "CAPA: ", valor
                             print *,"ENCONTRADO LA MATRIZ"
                             capaTemp = miArbolCapas%buscarNodo(valor)
-                            call capaTemp%matriz%mostrarMatriz()
                             print *,"MATRIZ ENCONTRADA"
                             call arbol%ingresarCapas(id,capaTemp%key,capaTemp%matriz)         
                         end if

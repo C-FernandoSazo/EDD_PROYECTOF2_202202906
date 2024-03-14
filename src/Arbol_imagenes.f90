@@ -1,5 +1,5 @@
 module Arbol_Imagenes
-    use Arbol_Capas
+    use Arbol_Capa
     implicit none
 
     type :: NodoImagen
@@ -147,10 +147,15 @@ contains
 
     subroutine graficarAVL(arbol)
         class(ArbolImagenes), intent(in) :: arbol
-        character(len=12) :: filename = "arbolAVL.dot"
+        character(len=12) :: filename = "arbolAVL"
         integer :: fileUnit, iostat
 
-        open(newunit=fileUnit, file=filename, status='replace', iostat=iostat)
+        character(len=256) :: dotPath, pngPath
+
+        dotPath = 'dot/' // trim(filename) // '.dot'
+        pngPath = 'img/' // trim(adjustl(filename))
+
+        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
         if (iostat /= 0) then
             print *, "Error al abrir el archivo."
             return
@@ -162,7 +167,7 @@ contains
         end if
         write(fileunit,*) '}'
         close(fileUnit)
-        call system('dot -Tpng ' // trim(filename) // ' -o ' // trim(adjustl(filename)) // '.png')   
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')     
     end subroutine graficarAVL
 
     recursive subroutine escribirNodoRecursivos(nodo, unitNum)
