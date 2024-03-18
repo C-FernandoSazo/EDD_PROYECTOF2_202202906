@@ -1,5 +1,5 @@
 module Arbol_Imagenes
-    use Arbol_Capa
+    use Arbol_CapaAV
     implicit none
 
     type :: NodoImagen
@@ -207,7 +207,6 @@ contains
             call imprimirRecursivos(nodo%left)
             ! Imprimir clave actual del nodo
             print *, "Imagen:", nodo%id
-            call nodo%arbolCapa%imprimirEnOrden()
             print *, ""
             ! Imprimir subárbol derecho
             call imprimirRecursivos(nodo%right)

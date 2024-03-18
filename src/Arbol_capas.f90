@@ -1,5 +1,5 @@
-module Arbol_Capa
-    use matriz_Dispersass
+module Arbol_CapaAV
+    use matriz_Dispersasss
     implicit none
     ! Arbol Binario de Busqueda ABB
 
@@ -28,6 +28,9 @@ module Arbol_Capa
             procedure :: postorder
             procedure :: calcularProfundidad
             procedure :: imprimirHojas
+            procedure :: preorderLimit
+            procedure :: inorderLimit
+            procedure :: postorderLimit
     end type ArbolCapas
 
 contains 
@@ -304,5 +307,88 @@ contains
             if (associated(nodo%right)) call imprimirHojasRecursivo(nodo%right)
         end if
     end subroutine imprimirHojasRecursivo
+
+    subroutine preorderLimit(this, tmp, limit, contador, matriz) 
+        class(ArbolCapas), intent(in) :: this
+        type(NodoCapa), intent(in), pointer :: tmp
+        type(nodo_matriz), pointer :: nodoActual, filaActual
+        integer, intent(in) :: limit
+        integer, intent(inout) :: contador 
+        type(matrizDispersa), intent(inout) :: matriz
+        if( .not. associated(tmp)) then
+            return
+        end if
+        if (contador /= limit) then
+            contador = contador + 1
+            filaActual => tmp%capa%matriz%head%down
+            do while (associated(filaActual))
+                nodoActual => filaActual%right
+                
+                do while(associated(nodoActual))
+                    call matriz%agregarMatriz(nodoActual%fila, nodoActual%columna, nodoActual%color)
+                    nodoActual => nodoActual%right
+                end do
+                filaActual => filaActual%down
+            end do
+            call this%preorderLimit(tmp%left,limit,contador,matriz)
+            call this%preorderLimit(tmp%right,limit,contador,matriz)
+        end if
+    end subroutine preorderLimit
+
+    subroutine inorderLimit(this, tmp, limit, contador, matriz)
+        class(ArbolCapas), intent(in) :: this
+        type(NodoCapa), intent(in), pointer :: tmp
+        type(nodo_matriz), pointer :: filaActual, nodoActual
+        integer, intent(in) :: limit
+        integer, intent(inout) :: contador 
+        type(matrizDispersa), intent(inout) :: matriz
+        
+        if( .not. associated(tmp)) then
+            return
+        end if
+        call this%inorderLimit(tmp%left,limit,contador,matriz)
+        if (contador /= limit) then
+            contador = contador + 1
+            filaActual => tmp%capa%matriz%head%down
+            do while (associated(filaActual))
+                nodoActual => filaActual%right
+                
+                do while(associated(nodoActual))
+                    call matriz%agregarMatriz(nodoActual%fila, nodoActual%columna, nodoActual%color)
+                    nodoActual => nodoActual%right
+                end do
+                filaActual => filaActual%down
+            end do
+        end if
+        call this%inorderLimit(tmp%right,limit,contador,matriz)
+    end subroutine inorderLimit
+
+    subroutine postorderLimit(this, tmp, limit, contador, matriz)
+        class(ArbolCapas), intent(in) :: this
+        type(NodoCapa), intent(in), pointer :: tmp
+        type(nodo_matriz), pointer :: filaActual, nodoActual
+        integer, intent(in) :: limit
+        integer, intent(inout) :: contador 
+        type(matrizDispersa), intent(inout) :: matriz
+        
+        if( .not. associated(tmp)) then
+            return
+        end if
+        call this%postorderLimit(tmp%left,limit,contador,matriz)
+        call this%postorderLimit(tmp%right,limit,contador,matriz)
+        if (contador /= limit) then
+            contador = contador + 1
+            filaActual => tmp%capa%matriz%head%down
+            do while (associated(filaActual))
+                nodoActual => filaActual%right
+                
+                do while(associated(nodoActual))
+                    call matriz%agregarMatriz(nodoActual%fila, nodoActual%columna, nodoActual%color)
+                    nodoActual => nodoActual%right
+                end do
+                filaActual => filaActual%down
+            end do
+        end if
+    end subroutine postorderLimit
     
-end module Arbol_Capa
+end module Arbol_CapaAV

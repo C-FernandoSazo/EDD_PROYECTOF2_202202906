@@ -1,13 +1,13 @@
 module lecturaJson
     use json_module
-    use lista_clientes
-    use matriz_Dispersass
-    use Arbol_Capa
+    use Arbol_clientes
+    use matriz_Dispersasss
+    use Arbol_CapaAV
     implicit none
 contains
 
-    subroutine leerClientes(lista, filename)
-        type(listaClientes), intent(inout) :: lista
+    subroutine leerClientes(arbol, filename)
+        type(ArbolClientes), intent(inout) :: arbol
         character(len=*), intent(in) :: filename
         type(json_file) :: json
         type(json_core) :: jCore
@@ -52,11 +52,10 @@ contains
                 call jCore%get(attributePointer, password)
                 clienteTemp%password = password
             end if
-            
-            call lista%agregarCliente(clienteTemp)
+            call arbol%insert(clienteTemp)
             
         end do
-    
+        call arbol%traversal(arbol%root)
         ! Finalizar la biblioteca JSON
         call json%destroy()
     

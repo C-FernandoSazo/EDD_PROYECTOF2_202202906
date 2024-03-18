@@ -1,16 +1,19 @@
 program main
   use lecturaJson
-  use lista_clientes
-  use Arbol_Capa
+  use Arbol_clientes
+  use matriz_Dispersasss
+  use Arbol_CapaAV
   use Arbol_Imagenes
   use listaAlbum
   implicit none
-  Type(listaClientes) :: milistaClientes
+  Type(ArbolClientes) :: miArbolClientes
   Type(Cliente) :: clienteTemp
+  type(matrizDispersa) :: matriztmp
   type(ArbolCapas) :: miArbolCapas
   type(ArbolImagenes) :: miArbolImg
   type(lista_album) :: miListaAlbum
-  integer :: opcion, opcionAdmin, opcionClient, opcionReportClient
+  integer :: opcion, opcionAdmin, opcionClient, opcionReportClient, opcionGenImg, limite, opcionLimit
+  integer :: contadorLimite, opcionOPClient, clientModificar
   character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
 
   do
@@ -25,7 +28,7 @@ program main
         read (*,'(A)') loginNombre
         print*, "Ingresa la contrasena:"
         read (*,*) loginPass
-        clienteTemp = milistaClientes%buscarCliente(loginNombre,loginPass)
+        clienteTemp = miArbolClientes%buscar(loginNombre,loginPass)
 
         if (loginNombre == "admin" .and. loginPass == "EDD2024") then
           !INTERFAZ DE ADMINISTRADOR
@@ -40,9 +43,39 @@ program main
               case(1)
       
               case(2)
-      
+                do
+                  print *, "1. Insertar Usuario"
+                  print *, "2. Modificar Usuario"
+                  print *, "3. Regresar"
+                  read(*,*) opcionOPClient
+                  select case (opcionOPClient)
+                    case(1)
+                      print*, "Ingresa el nombre del nuevo usuario:"
+                      read (*,*) newNombre 
+                      clienteTemp%nombre = newNombre
+                      print*, "Ingresa el DPI del nuevo usuario:"
+                      read (*,*) newDPI
+                      clienteTemp%dpi = newDPI
+                      print*, "Ingresa la contrasena del nuevo usuario:"
+                      read (*,*) newPassword
+                      clienteTemp%password = newPassword
+              
+                      call miArbolClientes%insert(clienteTemp)
+                    case(2)
+                      print *,"Selecciona el ID del cliente que deseas modificar"
+                      call miArbolClientes%imprimirClientes()
+                      read (*,*) clientModificar
+                      print*, "Ingresa el nuevo nombre del usuario:"
+                      read (*,*) newNombre 
+                      print*, "Ingresa el nuevo DPI del usuario:"
+                      read (*,*) newDPI
+                      print*, "Ingresa la nueva contrasena del usuario:"
+                      read (*,*) newPassword
+                      call miArbolClientes%modificarCliente(clientModificar,newNombre,newPassword,newDPI)
+                  end select 
+                end do
               case(3)
-                call leerClientes(milistaClientes, &
+                call leerClientes(miArbolClientes, &
                 "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Clientes.json")
                 print *, "Se han agregado los clientes correctamente"
               case(4)
@@ -69,7 +102,44 @@ program main
                 call miListaAlbum%graficar_albums()
                 call miArbolCapas%raiz%capa%matriz%graficarMatrizDispersa()
               case(2)
-      
+                do
+                  call matriztmp%vaciarMatriz()
+                  print *, "Como te gustaria agregar una nueva imagen"
+                  print *, "1. Por recorrido limitado"
+                  print *, "2. Por arbol de imagenes"
+                  print *, "3. Por capa"
+                  print *, "4. Regresar"
+                  read(*,*) opcionGenImg
+                  select case(opcionGenImg)
+                    case(1)
+                      print *, "Escoge el recorrido: "
+                      print *, "1. Preorder"
+                      print *, "2. Inorder"
+                      print *, "3. Postorder"
+                      read (*,*) opcionLimit
+                      print *, "Ingresa el limite del recorrido:"
+                      read (*,*) limite
+                      contadorLimite = 0
+                      select case(opcionLimit)
+                        case(1)
+                          call miArbolCapas%preorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
+                        case(2)
+                          call miArbolCapas%inorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
+                        case(3)
+                          call miArbolCapas%postorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
+                        case default
+                          print *, "Selecciona una opcion valida"
+                      end select
+                      call matriztmp%mostrarMatriz()
+                    case(2)
+                      print *, "Imagenes disponibles: "
+                      call miArbolImg%imprimirArbolImg()
+                    case(4)
+                      exit
+                    case default
+                      print *, "Selecciona una opcion valida"
+                    end select
+                end do
               case(3)
                 call leerCapas(miArbolCapas, &
                 "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Capas.json")
@@ -134,8 +204,7 @@ program main
         read (*,*) newPassword
         clienteTemp%password = newPassword
 
-        call milistaClientes%agregarCliente(clienteTemp)
-        call milistaClientes%printlista()
+        call miArbolClientes%insert(clienteTemp)
       case (3)
         exit
       case default

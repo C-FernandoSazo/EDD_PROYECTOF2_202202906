@@ -1,4 +1,4 @@
-module matriz_Dispersass
+module matriz_Dispersasss
     implicit none
 
     type :: nodovalor
@@ -8,7 +8,6 @@ module matriz_Dispersass
     end type nodovalor
 
     type :: nodo_matriz
-        private
         integer :: fila, columna
         character(len=7) :: color
         type(nodo_matriz), pointer :: up => null()
@@ -18,7 +17,6 @@ module matriz_Dispersass
     end type nodo_matriz
 
     type :: matrizDispersa
-        private
         type(nodo_matriz), pointer :: head => null()
         integer :: largo = 0
         integer :: ancho = 0
@@ -35,6 +33,7 @@ module matriz_Dispersass
             procedure :: printColumnHeaders
             procedure :: agregarMatriz
             procedure :: getValor
+            procedure :: vaciarMatriz
     end type matrizDispersa
 
 contains
@@ -273,7 +272,7 @@ contains
         type(nodovalor) :: val
         character(len=256) :: dotPath, pngPath
         aux => self%head%down
-        
+
         dotPath = 'dot/' // trim(filename) // '.dot'
         pngPath = 'img/' // trim(adjustl(filename))
 
@@ -356,5 +355,53 @@ contains
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
     end subroutine graficarMatrizDispersa
 
+    subroutine vaciarMatriz(self)
+        class(matrizDispersa), intent(inout) :: self
+        type(nodo_matriz), pointer :: currentRow, nextRow, currentNode, nextNode
+        
+        if (.not. associated(self%head)) then
+            return
+        end if
+        currentRow => self%head%down
+        do while(associated(currentRow))
+            ! Guarda el siguiente encabezado de fila antes de liberar el actual.
+            nextRow => currentRow%down
+            
+            ! Recorre y libera todos los nodos en la fila actual.
+            currentNode => currentRow%right
+            do while(associated(currentNode))
+                nextNode => currentNode%right
+                nullify(currentNode%up)
+                nullify(currentNode%down)
+                nullify(currentNode%left)
+                deallocate(currentNode)
+                currentNode => nextNode
+            end do
+            
+            ! Libera el encabezado de la fila.
+            nullify(currentRow%up)
+            nullify(currentRow%down)
+            deallocate(currentRow)
+            currentRow => nextRow
+        end do
+        
+        ! Repite el proceso para los encabezados de columna.
+        currentNode => self%head%right
+        do while(associated(currentNode))
+            nextNode => currentNode%right
+            nullify(currentNode%up)
+            nullify(currentNode%down)
+            nullify(currentNode%left)
+            deallocate(currentNode)
+            currentNode => nextNode
+        end do
+    
+        ! Restablece las propiedades de la matriz.
+        deallocate(self%head)
+        self%head => null()
+        self%largo = 0
+        self%ancho = 0
+    end subroutine vaciarMatriz
 
-end module matriz_Dispersass
+
+end module matriz_Dispersasss
