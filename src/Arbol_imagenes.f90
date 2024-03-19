@@ -1,6 +1,7 @@
 module Arbol_Imagenes
-    use Arbol_CapaAV
+    use Arbol_CapaBss
     implicit none
+    ! Arbol AVL
 
     type :: NodoImagen
         integer :: id
@@ -24,6 +25,7 @@ module Arbol_Imagenes
             procedure :: graficarAVL
             procedure :: imprimirArbolImg
             procedure :: ingresarCapas
+            procedure :: buscarImg
     end type ArbolImagenes
 
 contains 
@@ -207,6 +209,7 @@ contains
             call imprimirRecursivos(nodo%left)
             ! Imprimir clave actual del nodo
             print *, "Imagen:", nodo%id
+            call nodo%arbolCapa%imprimirEnOrden()
             print *, ""
             ! Imprimir subárbol derecho
             call imprimirRecursivos(nodo%right)
@@ -240,5 +243,40 @@ contains
         end if
     end subroutine capasRecursivo
     
+    function buscarImg(arbol, key) result(imgEncontrada)
+        class(ArbolImagenes), intent(in) :: arbol
+        integer, intent(in) :: key
+        type(NodoImagen) ,pointer :: imgEncontrada
+
+        imgEncontrada => buscarRecursivoImg(arbol%raiz, key)
+        print *,"MOSTRANDO EL ARBOL ANTES DE SER ENVIADO"
+        call imgEncontrada%arbolCapa%imprimirEnOrden()
+    end function buscarImg
+
+    ! Subrutina recursiva para buscar un nodo
+    recursive function buscarRecursivoImg(nodo, key) result(nodoEncontrado)
+        type(NodoImagen), pointer, intent(in) :: nodo
+        integer, intent(in) :: key
+        type(NodoImagen), pointer :: nodoEncontrado
+
+        ! Si el nodo actual es nulo, no se encontró el nodo buscado
+        if (.not. associated(nodo)) then
+            nodoEncontrado => null()
+            return
+        end if
+
+        ! Si la clave buscada es menor que la clave del nodo actual, buscar en el subárbol izquierdo
+        if (key < nodo%id) then
+            nodoEncontrado => buscarRecursivoImg(nodo%left, key)
+        ! Si la clave buscada es mayor que la clave del nodo actual, buscar en el subárbol derecho
+        else if (key > nodo%id) then
+            nodoEncontrado => buscarRecursivoImg(nodo%right, key)
+        ! Si la clave buscada es igual a la clave del nodo actual, hemos encontrado el nodo
+        else
+            print *, "Arbol encontrado dentro del metodo", nodo%id
+            call nodo%arbolCapa%imprimirEnOrden()
+            nodoEncontrado => nodo
+        end if
+    end function buscarRecursivoImg
 
 end module Arbol_Imagenes

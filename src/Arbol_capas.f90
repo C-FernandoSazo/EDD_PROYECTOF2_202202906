@@ -1,5 +1,5 @@
-module Arbol_CapaAV
-    use matriz_Dispersasss
+module Arbol_CapaBss
+    use matriz_DispersaI
     implicit none
     ! Arbol Binario de Busqueda ABB
 
@@ -31,6 +31,8 @@ module Arbol_CapaAV
             procedure :: preorderLimit
             procedure :: inorderLimit
             procedure :: postorderLimit
+            procedure :: recorridoAmplitud
+            procedure :: apilarMatriz
     end type ArbolCapas
 
 contains 
@@ -115,8 +117,7 @@ contains
             ! Imprimir subárbol izquierdo
             call imprimirRecursivo(nodo%left)
             ! Imprimir clave actual del nodo
-            print *, "Clave:", nodo%capa%key
-            call nodo%capa%matriz%mostrarMatriz()
+            write(*,'(A,I0)') "Clave: ", nodo%capa%key
             ! Imprimir subárbol derecho
             call imprimirRecursivo(nodo%right)
         end if
@@ -266,13 +267,13 @@ contains
         write (*, '(A,I0)', advance='no') ' Capa: ',tmp%capa%key
     end subroutine postorder
 
-    subroutine calcularProfundidad(arbol)
+    function calcularProfundidad(arbol) result(profundidad)
         class(ArbolCapas), intent(in) :: arbol
         integer :: profundidad
     
         profundidad = profundidadRecursiva(arbol%raiz)
-        write(*,'(A,I0)') "Profundidad del arbol: ",profundidad
-    end subroutine calcularProfundidad
+        
+    end function calcularProfundidad
     
     recursive function profundidadRecursiva(nodo) result(profundidadNodo)
         type(NodoCapa), pointer, intent(in) :: nodo
@@ -390,5 +391,82 @@ contains
             end do
         end if
     end subroutine postorderLimit
+
+    subroutine recorridoAmplitud(arbol,matriz)
+        class(ArbolCapas), intent(in) :: arbol
+        type(matrizDispersa), intent(inout) :: matriz
+        integer :: alturaArbol, nivel
     
-end module Arbol_CapaAV
+        alturaArbol = arbol%calcularProfundidad()
+        ! Recorrer cada nivel del árbol
+        do nivel = 0, alturaArbol
+            call recorrerNivel(arbol%raiz, nivel, matriz)
+        end do
+    end subroutine recorridoAmplitud
+
+    recursive subroutine recorrerNivel(nodo, nivel, matriz)
+        type(NodoCapa), pointer, intent(in) :: nodo
+        integer, intent(in) :: nivel
+        type(matrizDispersa), intent(inout) :: matriz
+        type(nodo_matriz), pointer :: filaActual, nodoActual
+
+        if (.not. associated(nodo)) then
+            return
+        end if
+        if (nivel == 0) then
+            print *, "Clave:", nodo%capa%key
+            filaActual => nodo%capa%matriz%head%down
+            do while (associated(filaActual))
+                nodoActual => filaActual%right
+                
+                do while(associated(nodoActual))
+                    call matriz%agregarMatriz(nodoActual%fila, nodoActual%columna, nodoActual%color)
+                    nodoActual => nodoActual%right
+                end do
+                filaActual => filaActual%down
+            end do
+        else
+            call recorrerNivel(nodo%left, nivel-1, matriz)
+            call recorrerNivel(nodo%right, nivel-1, matriz)
+        end if
+    end subroutine recorrerNivel
+
+    subroutine apilarMatriz(arbol, key, matriz)
+        class(ArbolCapas), intent(in) :: arbol
+        integer, intent(in) :: key
+        type(matrizDispersa), intent(inout) :: matriz
+
+        call apilarRecursivo(arbol%raiz,key, matriz)
+
+    end subroutine apilarMatriz
+
+    ! Subrutina recursiva para buscar un nodo
+    recursive subroutine apilarRecursivo(nodo, key, matriz) 
+        type(NodoCapa), pointer, intent(in) :: nodo
+        integer, intent(in) :: key
+        type(matrizDispersa), intent(inout) :: matriz
+        type(nodo_matriz), pointer :: filaActual, nodoActual
+
+        if (.not. associated(nodo)) then
+            return
+        end if
+
+        if (key < nodo%capa%key) then
+            call apilarRecursivo(nodo%left, key, matriz)
+        else if (key > nodo%capa%key) then
+            call apilarRecursivo(nodo%right, key, matriz)
+        else
+            filaActual => nodo%capa%matriz%head%down
+            do while (associated(filaActual))
+                nodoActual => filaActual%right
+                
+                do while(associated(nodoActual))
+                    call matriz%agregarMatriz(nodoActual%fila, nodoActual%columna, nodoActual%color)
+                    nodoActual => nodoActual%right
+                end do
+                filaActual => filaActual%down
+            end do
+        end if
+    end subroutine apilarRecursivo
+        
+end module Arbol_CapaBss

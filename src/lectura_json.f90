@@ -1,8 +1,8 @@
 module lecturaJson
     use json_module
     use Arbol_clientes
-    use matriz_Dispersasss
-    use Arbol_CapaAV
+    use matriz_DispersaI
+    use Arbol_CapaBss
     implicit none
 contains
 
@@ -104,29 +104,24 @@ contains
                 call jCore%get_child(pJsonValue, 'pixeles', pPixelsArray, found=found)
                 if (found) then
                     call jCore%info(pPixelsArray, n_children=nPixeles)
-                    write (*,*) "NPIXELES: ", nPixeles
                     do j = 1, nPixeles
-                        print *, "ENTRO A PIXELES"
                         call jCore%get_child(pPixelsArray, j, pPixelValue, found=found)
                         if (found) then
                             ! Extraer fila, columna y color de cada pixel
                             call jCore%get_child(pPixelValue, 'fila', attributePointer, found=found)
                             if (found) then 
                                 call jCore%get(attributePointer, fila)
-                                write(*,*) fila
                             end if
 
                             call jCore%get_child(pPixelValue, 'columna', attributePointer, found=found)
                             if (found) then 
                                 call jCore%get(attributePointer, columna)
-                                write(*,*) columna
                             end if
 
                             call jCore%get_child(pPixelValue, 'color', attributePointer, found=found)
                             if (found) then 
                                 call jCore%get(attributePointer, colorTemp)
                                 color = colorTemp
-                                write(*,*) color
                             end if
                             call arbol%ingresarMatriz(key,fila,columna,color)
                         end if

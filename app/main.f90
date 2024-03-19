@@ -1,8 +1,8 @@
 program main
   use lecturaJson
   use Arbol_clientes
-  use matriz_Dispersasss
-  use Arbol_CapaAV
+  use matriz_DispersaI
+  use Arbol_CapaBss
   use Arbol_Imagenes
   use listaAlbum
   implicit none
@@ -12,8 +12,10 @@ program main
   type(ArbolCapas) :: miArbolCapas
   type(ArbolImagenes) :: miArbolImg
   type(lista_album) :: miListaAlbum
+  type(NodoImagen), pointer :: imagenTemp
+  character(len=5) :: opCaracter
   integer :: opcion, opcionAdmin, opcionClient, opcionReportClient, opcionGenImg, limite, opcionLimit
-  integer :: contadorLimite, opcionOPClient, clientModificar
+  integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa
   character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
 
   do
@@ -100,7 +102,6 @@ program main
                 call miArbolCapas%graficarABB()
                 call miArbolImg%graficarAVL()
                 call miListaAlbum%graficar_albums()
-                call miArbolCapas%raiz%capa%matriz%graficarMatrizDispersa()
               case(2)
                 do
                   call matriztmp%vaciarMatriz()
@@ -130,10 +131,38 @@ program main
                         case default
                           print *, "Selecciona una opcion valida"
                       end select
-                      call matriztmp%mostrarMatriz()
+                      call matriztmp%graficarMatrizDispersa()
+                      call matriztmp%generarImagen()
                     case(2)
                       print *, "Imagenes disponibles: "
                       call miArbolImg%imprimirArbolImg()
+                      print *, "Selecciona el id de la imagen que deseas visualizar"
+                      read(*,*) amplitud
+                      imagenTemp => miArbolImg%buscarImg(amplitud)
+                      print *, "Arbol encontrado"
+                      call imagenTemp%arbolCapa%graficarABB()
+                      print *, "RECORRIDO EN AMPLITUD"
+                      call imagenTemp%arbolCapa%recorridoAmplitud(matriztmp)
+                      call matriztmp%graficarMatrizDispersa()
+                      call matriztmp%generarImagen()
+                    case(3)
+                      do
+                        print*,"Capas disponibles:"
+                        call miArbolCapas%imprimirEnOrden()
+                        print*,"Selecciona el id de una"
+                        read(*,*) idcapa
+                        call miArbolCapas%apilarMatriz(idcapa,matriztmp)
+                        print *,"Deseas ingresar otra capa? (si/no)"
+                        read (*,*) opCaracter
+                        select case(opCaracter)
+                        case('si')
+                          continue
+                        case('no')
+                          call matriztmp%graficarMatrizDispersa()
+                          call matriztmp%generarImagen()
+                          exit
+                        end select
+                      end do
                     case(4)
                       exit
                     case default
@@ -143,18 +172,9 @@ program main
               case(3)
                 call leerCapas(miArbolCapas, &
                 "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Capas.json")
-                print *,""
-                print *,"ARBOL DE CAPAS HA SIDO LLENADO"
-                call miArbolCapas%imprimirEnOrden()
-                print *,""
                 call leerImagenes(miArbolImg, miArbolCapas, &
                 "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Imagenes.json")
-                print *, "EL ARBOL DE IMAGENES HA SIDO COMPLETADO"
-                call miArbolImg%imprimirArbolImg()
-                print *, "\nCORROBORANDO ARBOL CAPAS ORIGINLA: "
-                call miArbolCapas%imprimirEnOrden()
                 call leerAlbumes(miListaAlbum,"C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Albumes.json")
-                call miListaAlbum%mostrarAlbum()
               case(4)
                 do
                   print *, "1. Top 5 de imagenes con mas numero de capas"
@@ -168,7 +188,8 @@ program main
                     case(2)
                       call miArbolCapas%imprimirHojas()
                     case(3)
-                      call miArbolCapas%calcularProfundidad()
+                      profundidad =  miArbolCapas%calcularProfundidad()
+                      write(*,'(A,I0)') "Profundidad del arbol: ",profundidad
                     case(4)
                       print *, "Recorrido Preorder"
                       call miArbolCapas%preorder(miArbolCapas%raiz)

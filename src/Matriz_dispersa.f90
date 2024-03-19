@@ -1,4 +1,4 @@
-module matriz_Dispersasss
+module matriz_DispersaI
     implicit none
 
     type :: nodovalor
@@ -34,6 +34,7 @@ module matriz_Dispersasss
             procedure :: agregarMatriz
             procedure :: getValor
             procedure :: vaciarMatriz
+            procedure :: generarImagen
     end type matrizDispersa
 
 contains
@@ -276,6 +277,7 @@ contains
         dotPath = 'dot/' // trim(filename) // '.dot'
         pngPath = 'img/' // trim(adjustl(filename))
 
+        print *,"Generando matriz dispersa..."
         open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
         if (iostat /= 0) then
             print *, "Error al abrir el archivo."
@@ -325,26 +327,26 @@ contains
             do j = 0, self%ancho
                 val = self%getValor(i,j)
                 if(.not. val%existe) then
-                    write(fileUnit,'(I0,I0,A,I0,A)') i, j, '[label=" ", group=',  j+2,']'
+                    write(fileUnit,'(A,I0,A,I0,A,I0,A)') '"F',i, 'C', j, '" [label=" ", group=',  j+2,']'
                 else
-                    write(fileUnit, '(I0,I0,A,A,A)') i, j, '[label=" ", style=filled, fillcolor="', &
+                    write(fileUnit, '(A,I0,A,I0,A,A,A)') '"F',i, 'C', j, '" [label=" ", style=filled, fillcolor="', &
                     val%valor, '"]'
                 end if
                 if (i == 0 .and. j == 0) then
-                    write(fileUnit,'(A,I0,A,I0,I0)') '"Fil', i, '" -- ', i, j
-                    write(fileUnit,'(A,I0,A,I0,I0)') '"Col', j, '" -- ', i, j
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Fil', i, '" -- ', '"F',i, 'C', j, '"'
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Col', j, '" -- ', '"F',i, 'C', j, '"'
                 else if (i == 0) then
-                    write(fileUnit,'(A,I0,A,I0,I0)') '"Col', j, '" -- ', i, j
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Col', j, '" -- ', '"F',i, 'C', j, '"'
                 else if (j == 0) then
-                    write(fileUnit,'(A,I0,A,I0,I0)') '"Fil', i, '" -- ', i, j
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Fil', i, '" -- ', '"F',i, 'C', j, '"'
                 end if 
-                if (j /= self%ancho) write(fileUnit,'(I0,I0,A,I0,I0)') i, j, " -- ", i, j+1
-                if (i /= self%largo) write(fileUnit,'(I0,I0,A,I0,I0)') i, j, " -- ", i+1, j
+                if (j /= self%ancho) write(fileUnit,'(A,I0,A,I0,A,A,I0,A,I0,A)') '"F',i, 'C', j, '" -- ' , '"F',i, 'C', j+1, '"'
+                if (i /= self%largo) write(fileUnit,'(A,I0,A,I0,A,A,I0,A,I0,A)') '"F',i, 'C', j, '" -- ', '"F',i+1, 'C', j, '"'
             end do
 
             write(fileUnit, '(A,I0,A)') ' { rank=same; "Fil', i, '";'
             do j=0, self%ancho
-                write(fileUnit, '(I0,I0,A)', advance='no') i, j, ';'
+                write(fileUnit, '(A,I0,A,I0,A)', advance='no') '"F',i, 'C', j, '";'
             end do
             write(fileUnit, *) "}"
         end do
@@ -403,5 +405,99 @@ contains
         self%ancho = 0
     end subroutine vaciarMatriz
 
+    subroutine generarImagen(self)
+        class(matrizDispersa), intent(inout) :: self  
+        character(len=18) :: filename = "imagenGenerada"
+        integer :: i, j, fileUnit, iostat
+        type(nodo_matriz), pointer :: aux
+        type(nodovalor) :: val
+        character(len=256) :: dotPath, pngPath
+        aux => self%head%down
 
-end module matriz_Dispersasss
+        dotPath = 'dot/' // trim(filename) // '.dot'
+        pngPath = 'img/' // trim(adjustl(filename))
+
+        print *,"Generando imagen..."
+        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
+        if (iostat /= 0) then
+            print *, "Error al abrir el archivo."
+            return
+        end if
+
+        write(fileUnit, *) "graph matriz {"
+        write(fileUnit, *) "    node [shape=box, style=filled, color=white];"
+
+        write(fileUnit,'(A)') '"Origen" [label="-1", group = 1]'
+
+        !Generacion de encabezados de cada columna
+        do j=0, self%ancho
+            write(fileUnit,'(A,I0,A,I0,A,I0,A)') '"Col', j, '"[label="', j, '", group =', j+2, ']'
+            if (.not. j == 0) then
+            if (j /= self%ancho) then
+                write(fileUnit,'(A,I0,A,I0,A)') '"Col', j, '" --  "Col', j+1, '" [color=white];'
+            end if
+            else
+                write(fileUnit,'(A,I0,A,I0,A)') '"Origen" --  "Col', j, '" [color=white];'
+                write(fileUnit,'(A,I0,A,I0,A)') '"Col', j, '" --  "Col', j+1, '" [color=white];'
+            end if
+        end do
+
+        write(fileUnit, *) ' { rank=same; "Origen";'
+
+        do j=0, self%ancho
+            write(fileUnit, '(A,I0,A)', advance='no') ' "Col', j, '";'
+        end do
+
+        write(fileUnit, *) " }"
+
+        ! Generacion de encabezados de cada Fila
+        do i=0, self%largo
+            write(fileUnit,'(A,I0,A,I0,A)') '"Fil', i, '"[label="', i, '", group = 1]'
+            if (.not. i == 0) then
+            if (i /= self%largo) then
+                write(fileUnit,'(A,I0,A,I0,A)') '"Fil', i, '" --  "Fil', i+1, '" [color=white];'
+            end if
+            else
+                write(fileUnit,'(A,I0,A,I0,A)') '"Origen" --  "Fil', i, '" [color=white];'
+                write(fileUnit,'(A,I0,A,I0,A)') '"Fil', i, '" --  "Fil', i+1, '" [color=white];'
+            end if
+        end do
+
+        do i = 0, self%largo
+            do j = 0, self%ancho
+                val = self%getValor(i,j)
+                if(.not. val%existe) then
+                    write(fileUnit,'(A,I0,A,I0,A,I0,A)') '"F',i, 'C', j, '" [label=" ", group=',  j+2,']'
+                else
+                    write(fileUnit, '(A,I0,A,I0,A,A,A)') '"F',i, 'C', j, '" [label=" ", style=filled, fillcolor="', &
+                    val%valor, '"]'
+                end if
+                if (i == 0 .and. j == 0) then
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Fil', i, '" -- ', '"F',i, 'C', j, '" [color=white];'
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Col', j, '" -- ', '"F',i, 'C', j, '" [color=white];'
+                else if (i == 0) then
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Col', j, '" -- ', '"F',i, 'C', j, '" [color=white];'
+                else if (j == 0) then
+                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Fil', i, '" -- ', '"F',i, 'C', j, '" [color=white];'
+                end if 
+                if (j /= self%ancho) write(fileUnit,'(A,I0,A,I0,A,A,I0,A,I0,A)') '"F',i, 'C', j, '" -- ' , '"F',i, 'C', j+1, &
+                '" [color=white];'
+                if (i /= self%largo) write(fileUnit,'(A,I0,A,I0,A,A,I0,A,I0,A)') '"F',i, 'C', j, '" -- ', '"F',i+1, 'C', j, &
+                '" [color=white];'
+            end do
+
+            write(fileUnit, '(A,I0,A)') ' { rank=same; "Fil', i, '";'
+            do j=0, self%ancho
+                write(fileUnit, '(A,I0,A,I0,A)', advance='no') '"F',i, 'C', j, '";'
+            end do
+            write(fileUnit, *) "}"
+        end do
+
+        write(fileUnit, *) "}"
+        close(fileUnit)
+    
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
+    end subroutine generarImagen
+
+
+end module matriz_DispersaI
