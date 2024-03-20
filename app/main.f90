@@ -7,7 +7,7 @@ program main
   use listaAlbum
   implicit none
   Type(ArbolClientes) :: miArbolClientes
-  Type(Cliente) :: clienteTemp
+  Type(Cliente) :: clienteTemp, newCliente
   type(matrizDispersa) :: matriztmp
   type(ArbolCapas) :: miArbolCapas
   type(ArbolImagenes) :: miArbolImg
@@ -17,7 +17,8 @@ program main
   character(len=5) :: opCaracter
   integer :: opcion, opcionAdmin, opcionClient, opcionReportClient, opcionGenImg, limite, opcionLimit
   integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa, idImg, graph
-  character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
+  integer(8) ::  newDPI
+  character(len=20) :: newNombre, newPassword, loginNombre, loginPass
 
   do
     print *, "---------Menu Principal---------"
@@ -55,15 +56,15 @@ program main
                     case(1)
                       print*, "Ingresa el nombre del nuevo usuario:"
                       read (*,*) newNombre 
-                      clienteTemp%nombre = newNombre
+                      newCliente%nombre = newNombre
                       print*, "Ingresa el DPI del nuevo usuario:"
                       read (*,*) newDPI
-                      clienteTemp%dpi = newDPI
+                      newCliente%dpi = newDPI
                       print*, "Ingresa la contrasena del nuevo usuario:"
                       read (*,*) newPassword
-                      clienteTemp%password = newPassword
+                      newCliente%password = newPassword
               
-                      call miArbolClientes%insert(clienteTemp)
+                      call miArbolClientes%insert(newCliente)
                     case(2)
                       print *,"Selecciona el ID del cliente que deseas modificar"
                       call miArbolClientes%imprimirClientes()
@@ -227,6 +228,8 @@ program main
                     print *,"Selecciona el id de la imagen que deseas eliminar"
                     read (*,*) idImg
                     call miArbolImg%eliminar(idImg)
+                    call miListaAlbum%deleteImagen(idImg)
+                    print *,"Imagen eliminada con exito"
                   case(3)
                     exit
                   end select
@@ -279,15 +282,15 @@ program main
       case(2)
         print*, "Ingresa el nombre del nuevo usuario:"
         read (*,*) newNombre 
-        clienteTemp%nombre = newNombre
+        newCliente%nombre = newNombre
         print*, "Ingresa el DPI del nuevo usuario:"
         read (*,*) newDPI
-        clienteTemp%dpi = newDPI
+        newCliente%dpi = newDPI
         print*, "Ingresa la contrasena del nuevo usuario:"
         read (*,*) newPassword
-        clienteTemp%password = newPassword
+        newCliente%password = newPassword
 
-        call miArbolClientes%insert(clienteTemp)
+        call miArbolClientes%insert(newCliente)
       case (3)
         exit
       case default

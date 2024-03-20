@@ -14,8 +14,9 @@ contains
         type(json_value), pointer :: pJsonArray, pJsonValue, attributePointer
         type(Cliente) :: clienteTemp
         integer :: i, nItems
+        integer(8) :: dpi
         logical :: found
-        character(:), allocatable :: nombre, dpi, password
+        character(:), allocatable :: nombre, dpiString, password
     
         ! Inicializar la biblioteca JSON
         call json%initialize()
@@ -37,7 +38,8 @@ contains
 
             call jCore%get_child(pJsonValue, 'dpi', attributePointer, found=found)
             if (found) then 
-                call jCore%get(attributePointer, dpi)
+                call jCore%get(attributePointer, dpiString)
+                read(dpiString,'(I13)') dpi
                 clienteTemp%dpi = dpi
             end if
 

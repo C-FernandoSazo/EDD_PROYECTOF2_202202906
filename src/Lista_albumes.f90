@@ -11,6 +11,7 @@ module listaImagen
         contains
             procedure :: agregarImagen
             procedure :: mostrarImagenes
+            procedure :: eliminarImagen
     end type lista_imagen
 contains
 
@@ -34,6 +35,39 @@ contains
         end if
 
     end subroutine agregarImagen   
+
+    subroutine eliminarImagen(lista, id)
+        class(lista_imagen), intent(inout) :: lista
+        integer, intent(in) :: id
+        type(NodoLimagen), pointer :: actual, anterior 
+    
+        actual => lista%head
+    
+        if (.not. associated(actual)) then
+            return
+        end if
+    
+        ! Si el nodo a eliminar es la cabeza de la lista
+        if (actual%id == id) then
+            lista%head => actual%siguiente
+            nullify(actual%siguiente)
+            deallocate(actual)
+            return
+        end if
+    
+        ! Buscar el nodo a eliminar, manteniendo un seguimiento del nodo anterior
+        do while(associated(actual%siguiente))
+            anterior => actual
+            actual => actual%siguiente
+            if (actual%id == id) then
+                anterior%siguiente => actual%siguiente
+                nullify(actual%siguiente)
+                deallocate(actual)
+                return
+            end if
+        end do
+    
+    end subroutine eliminarImagen    
 
     subroutine mostrarImagenes(lista)
         class(lista_imagen), intent(inout) :: lista
@@ -65,6 +99,7 @@ module listaAlbum
         contains
             procedure :: agregarAlbum
             procedure :: addImagen
+            procedure :: deleteImagen
             procedure :: mostrarAlbum
             procedure :: graficar_albums
     end type lista_album
@@ -106,6 +141,17 @@ contains
             actual => actual%siguiente
         end do
     end subroutine addImagen
+
+    subroutine deleteImagen(lista,img)
+        class(lista_album), intent(inout) :: lista
+        integer, intent(in) :: img
+        type(NodoAlbum), pointer :: actual
+        actual => lista%head
+        do while(associated(actual))
+            call actual%listImagenes%eliminarImagen(img)
+            actual => actual%siguiente
+        end do
+    end subroutine
 
     subroutine mostrarAlbum(lista)
         class(lista_album), intent(inout) :: lista

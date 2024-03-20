@@ -5,7 +5,8 @@ module Arbol_clientes
 
     type:: Cliente
         integer :: id
-        character(len=20) :: nombre, password, dpi
+        integer(8) :: dpi
+        character(len=20) :: nombre, password
     end type Cliente
 
     type nodeptr
@@ -65,14 +66,14 @@ contains
                 res = .true.
                 return
         end if
-        if (val%id < node%cliente(1)%id) then
+        if (val%dpi < node%cliente(1)%dpi) then
                 pos = 0
         else
                 pos = node%num
-                do while (val%id < node%cliente(pos)%id .and. pos > 1) 
+                do while (val%dpi < node%cliente(pos)%dpi .and. pos > 1) 
                 pos = pos - 1
                 end do
-                if (val%id == node%cliente(pos)%id .or. val%nombre == node%cliente(pos)%nombre) then
+                if (val%dpi == node%cliente(pos)%dpi .or. val%nombre == node%cliente(pos)%nombre) then
                     print *, "Elemento duplicado!"
                     res = .false.
                     return
@@ -230,7 +231,7 @@ contains
 
         do i = 1, nodo%num
             write (*,'(I0,A,A,A,A)') nodo%cliente(i)%id,". Nombre: ", trim(nodo%cliente(i)%nombre), &
-            ", DPI: ", trim(nodo%cliente(i)%dpi)
+            ", DPI: ", nodo%cliente(i)%dpi
         end do
     
         do i = 0, nodo%num
@@ -240,8 +241,9 @@ contains
     
     subroutine modificarCliente(this, id, nombre, password, dpi) 
         class(ArbolClientes), intent(in) :: this
-        character(len=20), intent(in) :: nombre, password, dpi
+        character(len=20), intent(in) :: nombre, password
         integer, intent(in) :: id
+        integer(8), intent(in) :: dpi
         type(BTreeNode), pointer :: actual
         actual => this%root
         call modificarRecursivo(actual,id,nombre,password, dpi)
@@ -249,8 +251,9 @@ contains
     
     recursive subroutine modificarRecursivo(nodo, id, nombre, password, dpi)
         type(BTreeNode), pointer, intent(in) :: nodo
-        character(len=20), intent(in) :: nombre, password, dpi
+        character(len=20), intent(in) :: nombre, password
         integer, intent(in) :: id
+        integer(8), intent(in) :: dpi
         integer :: i
     
         if (.not. associated(nodo)) then
