@@ -4,7 +4,7 @@ program main
   use matriz_DispersaI
   use Arbol_CapaBssss
   use Arbol_Imagenes
-  use listaAlbum
+  use listaAlbums
   implicit none
   Type(ArbolClientes) :: miArbolClientes
   Type(Cliente) :: clienteTemp, newCliente
@@ -19,6 +19,7 @@ program main
   integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa, idImg, graph
   integer(8) ::  newDPI
   character(len=20) :: newNombre, newPassword, loginNombre, loginPass
+  character(len=100) :: rutaArchivo
 
   do
     print *, "---------Menu Principal---------"
@@ -41,7 +42,7 @@ program main
             print *, "1. Arbol B de usuarios"
             print *, "2. Operaciones sobre los usuarios"
             print *, "3. Carga Masiva de Usuarios"
-            print *, "4. Regresar"
+            print *, "4. Cerrar Sesion"
             read (*,*) opcionAdmin
             select case(opcionAdmin)
               case(1)
@@ -71,16 +72,17 @@ program main
                       read (*,*) clientModificar
                       print*, "Ingresa el nuevo nombre del usuario:"
                       read (*,*) newNombre 
-                      print*, "Ingresa el nuevo DPI del usuario:"
-                      read (*,*) newDPI
                       print*, "Ingresa la nueva contrasena del usuario:"
                       read (*,*) newPassword
-                      call miArbolClientes%modificarCliente(clientModificar,newNombre,newPassword,newDPI)
+                      call miArbolClientes%modificarCliente(clientModificar,newNombre,newPassword)
+                    case(3)
+                      exit
                   end select 
                 end do
               case(3)
-                call leerClientes(miArbolClientes, &
-                "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Clientes.json")
+                print *,"Ingresa la ruta del archivo de Clientes"
+                read(*,*) rutaArchivo
+                call leerClientes(miArbolClientes,rutaArchivo)
                 print *, "Se han agregado los clientes correctamente"
               case(4)
                 exit
@@ -91,13 +93,16 @@ program main
 
         else if (clienteTemp%nombre /= "0") then
           ! INTERFAZ DE CLIENTE
+          miArbolImg = clienteTemp%miArbolImg
+          miListaAlbum = clienteTemp%miListaAlbum
+          miArbolCapas = clienteTemp%miArbolCapas
           do
             print *, "---------Modulo Cliente---------"
             print *, "1. Estado de las estructuras"
             print *, "2. Navegacion y gestion de imagenes"
             print *, "3. Carga Masiva de archivos"
             print *, "4. Reportes de Usuario"
-            print *, "5. Regresar"
+            print *, "5. Cerrar Sesion"
             read (*,*) opcionClient
             select case(opcionClient)
               case(1)
@@ -175,7 +180,6 @@ program main
                             case default
                               print *, "Selecciona una opcion valida"
                           end select           
-                          call matriztmp%graficarMatrizDispersa()
                           call matriztmp%generarImagen()
                         case(2)
                           print *, "Imagenes disponibles: "
@@ -187,7 +191,6 @@ program main
                           call imagenTemp%arbolCapa%graficarABB()
                           print *, "RECORRIDO EN AMPLITUD"
                           call imagenTemp%arbolCapa%recorridoAmplitud(matriztmp)
-                          call matriztmp%graficarMatrizDispersa()
                           call matriztmp%generarImagen()
                         case(3)
                           print *,"Con que id deseas guardar tu imagen (solo valores numericos)"
@@ -210,7 +213,6 @@ program main
                                 continue
                               case('no')
                                 print *,"Imagen guardada con exito"
-                                call matriztmp%graficarMatrizDispersa()
                                 call matriztmp%generarImagen()
                                 exit
                               end select
@@ -226,20 +228,24 @@ program main
                     end do
                   case(2)
                     print *,"Selecciona el id de la imagen que deseas eliminar"
+                    call miArbolImg%imprimirArbolImg()
                     read (*,*) idImg
                     call miArbolImg%eliminar(idImg)
                     call miListaAlbum%deleteImagen(idImg)
-                    print *,"Imagen eliminada con exito"
                   case(3)
                     exit
                   end select
                 end do
               case(3)
-                call leerCapas(miArbolCapas, &
-                "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Capas.json")
-                call leerImagenes(miArbolImg, miArbolCapas, &
-                "C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Imagenes.json")
-                call leerAlbumes(miListaAlbum,"C:\Users\Cesar\Documents\Programas\2024\EDD_PROYECTOF2_202202906\Albumes.json")
+                print *,"Ingresa la ruta del archivo de Capas"
+                read(*,*) rutaArchivo
+                call leerCapas(miArbolCapas,rutaArchivo)
+                print *,"Ingresa la ruta del archivo de Imagenes"
+                read(*,*) rutaArchivo
+                call leerImagenes(miArbolImg, miArbolCapas, rutaArchivo)
+                print *,"Ingresa la ruta del archivo de Albumes"
+                read(*,*) rutaArchivo
+                call leerAlbumes(miListaAlbum, rutaArchivo)
               case(4)
                 do
                   print *, "1. Top 5 de imagenes con mas numero de capas"
@@ -254,7 +260,7 @@ program main
                       call miArbolCapas%imprimirHojas()
                     case(3)
                       profundidad =  miArbolCapas%calcularProfundidad()
-                      write(*,'(A,I0)') "Profundidad del arbol: ",profundidad
+                      write(*,'(A,I0)') "La profundidad del arbol es: ",profundidad
                     case(4)
                       print *, "Recorrido Preorder"
                       call miArbolCapas%preorder(miArbolCapas%raiz)
@@ -270,12 +276,15 @@ program main
                   end select
                 end do
               case(5)
+                clienteTemp%miArbolCapas = miArbolCapas
+                clienteTemp%miArbolImg = miArbolImg
+                clienteTemp%miListaAlbum = miListaAlbum
+                call miArbolClientes%actualizarEstructuras(clienteTemp%dpi,clienteTemp)
                 exit
               case default
                 print *, "Selecciona algun valor que este en el menu"
             end select
           end do
-
         else 
           print *,"Usuario/Contrasena erronea"
         end if

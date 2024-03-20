@@ -1,0 +1,117 @@
+[
+    {
+        "id_capa": 5,
+        "pixeles": [
+            {"fila": 2, "columna": 1, "color": "#3F51B5"},
+            {"fila": 3, "columna": 2, "color": "#5C6BC0"},
+            {"fila": 3, "columna": 0, "color": "#3949AB"},
+            {"fila": 4, "columna": 0, "color": "#5C6BC0"},
+            {"fila": 4, "columna": 1, "color": "#7986CB"},
+            {"fila": 4, "columna": 2, "color": "#9FA8DA"},
+            {"fila": 5, "columna": 0, "color": "#C5CAE9"},
+            {"fila": 5, "columna": 2, "color": "#D1C4E9"},
+            {"fila": 3, "columna": 4, "color": "#3F51B5"},
+            {"fila": 4, "columna": 4, "color": "#3949AB"},
+            {"fila": 5, "columna": 4, "color": "#5C6BC0"},
+            {"fila": 2, "columna": 4, "color": "#7986CB"},
+            {"fila": 2, "columna": 5, "color": "#9FA8DA"},
+            {"fila": 2, "columna": 6, "color": "#C5CAE9"},
+            {"fila": 4, "columna": 5, "color": "#D1C4E9"},
+            {"fila": 3, "columna": 6, "color": "#7E57C2"},
+            {"fila": 5, "columna": 6, "color": "#B39DDB"},
+            {"fila": 5, "columna": 8, "color": "#9575CD"},
+            {"fila": 4, "columna": 8, "color": "#7E57C2"},
+            {"fila": 3, "columna": 8, "color": "#673AB7"}
+            
+        ]
+    },
+    {
+        "id_capa": 3,
+        "pixeles": [
+        {
+            "fila": 3,
+            "columna": 3,
+            "color": "#FFCC27"
+        }
+        ]
+    },
+    {
+        "id_capa": 2,
+        "pixeles": [
+        {
+            "fila": 5,
+            "columna": 5,
+            "color": "#FFCC27"
+        }
+        ]
+    },
+    {
+        "id_capa": 8,
+        "pixeles": [
+        {
+            "fila": 8,
+            "columna": 8,
+            "color": "#FFCC27"
+        }
+        ]
+    },
+    {
+        "id_capa": 9,
+        "pixeles": [
+            
+                {"fila": 1, "columna": 5, "color": "#FF0000"},
+                {"fila": 2, "columna": 4, "color": "#FF7F00"},
+                {"fila": 2, "columna": 6, "color": "#FF7F00"},
+                {"fila": 3, "columna": 3, "color": "#FFFF00"},
+                {"fila": 3, "columna": 7, "color": "#FFFF00"},
+                {"fila": 4, "columna": 2, "color": "#00FF00"},
+                {"fila": 4, "columna": 8, "color": "#00FF00"},
+                {"fila": 5, "columna": 1, "color": "#0000FF"},
+                {"fila": 5, "columna": 2, "color": "#0000FF"},
+                {"fila": 5, "columna": 3, "color": "#0000FF"},
+                {"fila": 5, "columna": 4, "color": "#0000FF"},
+                {"fila": 5, "columna": 5, "color": "#0000FF"},
+                {"fila": 5, "columna": 6, "color": "#0000FF"},
+                {"fila": 5, "columna": 7, "color": "#0000FF"},
+                {"fila": 5, "columna": 8, "color": "#0000FF"},
+                {"fila": 5, "columna": 9, "color": "#0000FF"},
+                {"fila": 6, "columna": 2, "color": "#4B0082"},
+                {"fila": 6, "columna": 8, "color": "#4B0082"},
+                {"fila": 7, "columna": 3, "color": "#9400D3"},
+                {"fila": 7, "columna": 7, "color": "#9400D3"},
+                {"fila": 8, "columna": 4, "color": "#FF0000"},
+                {"fila": 8, "columna": 6, "color": "#FF0000"},
+                {"fila": 9, "columna": 5, "color": "#FF7F00"}
+        ]
+    },
+    {
+        "id_capa": 4,
+        "pixeles": [
+        {
+            "fila": 4,
+            "columna": 4,
+            "color": "#FFCC27"
+        }
+        ]
+    },
+    {
+        "id_capa": 1,
+        "pixeles": [
+            {
+                "fila": 1,
+                "columna": 1,
+                "color": "#FF0000" 
+            }
+        ]
+    },
+    {
+        "id_capa": 6,
+        "pixeles": [
+        {
+            "fila": 6,
+            "columna": 6,
+            "color": "#FFCC27"
+        }
+        ]
+    }
+]

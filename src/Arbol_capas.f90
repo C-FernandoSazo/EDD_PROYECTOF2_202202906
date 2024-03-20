@@ -315,7 +315,7 @@ contains
         if (.not. associated(nodo)) return
         ! Si ambos hijos son nulos, el nodo es una hoja
         if (.not. associated(nodo%left) .and. .not. associated(nodo%right)) then
-            print *, "Nodo hoja con clave:", nodo%capa%key
+            write(*,'(A,I0)'), "Nodo hoja con clave: Capa ", nodo%capa%key
         else
             ! Si no, sigue buscando en los hijos
             if (associated(nodo%left)) call imprimirHojasRecursivo(nodo%left)

@@ -1,4 +1,7 @@
 module Arbol_clientes
+    use Arbol_CapaBssss
+    use Arbol_Imagenes
+    use listaAlbums
     implicit none
 
     integer, parameter :: MAXI = 4, MINI = 2 
@@ -7,7 +10,10 @@ module Arbol_clientes
         integer :: id
         integer(8) :: dpi
         character(len=20) :: nombre, password
-    end type Cliente
+        type(lista_album) :: miListaAlbum
+        type(ArbolImagenes) :: miArbolImg
+        type(ArbolCapas) :: miArbolCapas
+    end type Cliente    
 
     type nodeptr
         type (BTreeNode), pointer :: ptr => null()
@@ -32,6 +38,7 @@ module Arbol_clientes
             procedure :: buscar
             procedure :: imprimirClientes
             procedure :: modificarCliente
+            procedure :: actualizarEstructuras
     end type ArbolClientes
 
 contains
@@ -44,7 +51,6 @@ contains
         allocate(child)
         val%id = this%contador
         this%contador =  this%contador + 1
-        write (*,*) "ESTAMOS CON: ",val%id, val%nombre
         if (this%setValue(val, i, this%root, child)) then
                 this%root => this%createNode(i, child)
         end if
@@ -202,7 +208,6 @@ contains
         end if
     
         do i = 1, nodo%num
-            write (*,*) "ESTAMOS CON: ", trim(nodo%cliente(i)%nombre), " ", trim(nodo%cliente(i)%password)
             if (trim(nombre) == trim(nodo%cliente(i)%nombre) .and. trim(password) == trim(nodo%cliente(i)%password)) then
                 clienteEncontrado => nodo%cliente(i)
                 return
@@ -218,10 +223,10 @@ contains
         class(ArbolClientes), intent(in) :: this
         type(BTreeNode), pointer :: actual
         actual => this%root
-        call imprimirRecursivo(actual)
+        call imprimirRecursivoClient(actual)
     end subroutine imprimirClientes
 
-    recursive subroutine imprimirRecursivo(nodo)
+    recursive subroutine imprimirRecursivoClient(nodo)
         type(BTreeNode), pointer, intent(in) :: nodo
         integer :: i
 
@@ -235,25 +240,23 @@ contains
         end do
     
         do i = 0, nodo%num
-            call imprimirRecursivo(nodo%link(i)%ptr)
+            call imprimirRecursivoClient(nodo%link(i)%ptr)
         end do
     end subroutine
     
-    subroutine modificarCliente(this, id, nombre, password, dpi) 
+    subroutine modificarCliente(this, id, nombre, password) 
         class(ArbolClientes), intent(in) :: this
         character(len=20), intent(in) :: nombre, password
         integer, intent(in) :: id
-        integer(8), intent(in) :: dpi
         type(BTreeNode), pointer :: actual
         actual => this%root
-        call modificarRecursivo(actual,id,nombre,password, dpi)
+        call modificarRecursivo(actual,id,nombre,password)
     end subroutine modificarCliente
     
-    recursive subroutine modificarRecursivo(nodo, id, nombre, password, dpi)
+    recursive subroutine modificarRecursivo(nodo, id, nombre, password)
         type(BTreeNode), pointer, intent(in) :: nodo
         character(len=20), intent(in) :: nombre, password
         integer, intent(in) :: id
-        integer(8), intent(in) :: dpi
         integer :: i
     
         if (.not. associated(nodo)) then
@@ -261,20 +264,51 @@ contains
         end if
     
         do i = 1, nodo%num
-            write (*,*) "ESTAMOS CON: ", trim(nodo%cliente(i)%nombre), " ", trim(nodo%cliente(i)%password)
             if (nodo%cliente(i)%id == id) then
                     nodo%cliente(i)%nombre = nombre
                     nodo%cliente(i)%password = password
-                    nodo%cliente(i)%dpi = dpi
                     print *,"CAMBIO REALIZADO"
                 return
             end if
         end do
     
         do i = 0, nodo%num
-            call modificarRecursivo(nodo%link(i)%ptr,id,nombre,password,dpi)
+            call modificarRecursivo(nodo%link(i)%ptr,id,nombre,password)
         end do
     end subroutine modificarRecursivo
+
+    subroutine actualizarEstructuras(this, dpi, client) 
+        class(ArbolClientes), intent(in) :: this
+        integer(8), intent(in) :: dpi
+        type(Cliente), intent(in) :: client
+        type(BTreeNode), pointer :: actual
+        actual => this%root
+        call actualizarRecursivo(actual, dpi, client)
+    end subroutine actualizarEstructuras
+    
+    recursive subroutine actualizarRecursivo(nodo, dpi, client)
+        type(BTreeNode), pointer, intent(in) :: nodo
+        integer(8), intent(in) :: dpi
+        type(Cliente), intent(in) :: client
+        integer :: i
+    
+        if (.not. associated(nodo)) then
+            return
+        end if
+    
+        do i = 1, nodo%num
+            if (nodo%cliente(i)%dpi == dpi) then
+                nodo%cliente(i)%miArbolCapas = client%miArbolCapas
+                nodo%cliente(i)%miArbolImg = client%miArbolImg
+                nodo%cliente(i)%miListaAlbum = client%miListaAlbum
+                return
+            end if
+        end do
+    
+        do i = 0, nodo%num
+            call actualizarRecursivo(nodo%link(i)%ptr,dpi,client)
+        end do
+    end subroutine actualizarRecursivo
     
     
 end module Arbol_clientes

@@ -1,11 +1,3 @@
  digraph imagenes {
-6[label="Imagen 6"]
-           6  ->            1
 1[label="Imagen 1"]
-           1  ->            4
-4[label="Imagen 4"]
-           6  ->            9
-9[label="Imagen 9"]
-           9  ->           10
-10[label="Imagen 10"]
  }

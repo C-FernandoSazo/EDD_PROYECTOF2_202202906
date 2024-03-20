@@ -101,7 +101,7 @@ contains
                     call jCore%get(attributePointer, key)
                     call arbol%insertarNodo(key)
                 end if
-                write(*,*) key
+                write(*,'(A,I0,A)') "Leyendo capa ", key, "..."
                 ! Extraer el arreglo de pixeles
                 call jCore%get_child(pJsonValue, 'pixeles', pPixelsArray, found=found)
                 if (found) then
@@ -170,10 +170,9 @@ contains
                 call jCore%get_child(pJsonValue, 'id', attributePointer, found=found)
                 if (found) then
                     call jCore%get(attributePointer, id)
-                    write(*,'(A,I0)') "ESTE ES EL ID: ",id
                     call arbol%insertar(id)
                 end if
-                print *, "EXTRAYENDO CAPAS"
+                write(*,'(A,I0,A)') "Leyendo imagen ", id, "..."
                 call jCore%get_child(pJsonValue, 'capas', pCapasArray, found=found)
                 if (found) then
                     call jCore%info(pCapasArray, n_children=nCapas)
@@ -182,9 +181,7 @@ contains
                         if (found) then
                             call jCore%get(CapaValue, valor)
                             write(*,'(A,I0)') "CAPA: ", valor
-                            print *,"ENCONTRADO LA MATRIZ"
                             capaTemp = miArbolCapas%buscarNodo(valor)
-                            print *,"MATRIZ ENCONTRADA"
                             call arbol%ingresarCapas(id,capaTemp%key,capaTemp%matriz)         
                         end if
                     end do 
@@ -197,7 +194,7 @@ contains
     end subroutine leerImagenes
 
     subroutine leerAlbumes(miListaAlbum, filename)
-        use listaAlbum
+        use listaAlbums
         type(lista_album), intent(inout) :: miListaAlbum
         character(len=*), intent(in) :: filename
         type(json_file) :: json
@@ -233,7 +230,7 @@ contains
                     album = albumTemp
                     call miListaAlbum%agregarAlbum(album)
                 end if
-                print *, "EXTRAYENDO IMAGENES"
+                write(*,'(A,A,A)') "Leyendo ", trim(album), "..."
                 call jCore%get_child(pJsonValue, 'imgs', pImgsArray, found=found)
                 if (found) then
                     call jCore%info(pImgsArray, n_children=nImgs)

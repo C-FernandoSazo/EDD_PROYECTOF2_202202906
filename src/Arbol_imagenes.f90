@@ -40,10 +40,8 @@ contains
         type(NodoImagen), pointer :: temp
 
         if(associated(this%raiz)) then
-            print *,"ahora vamos a guardar el nodo"
             call this%add_recursivo(id,this%raiz)
         else 
-            print *,"RAIZ ES NULL"
             allocate(temp)
             temp%id =  id
             temp%altura = 0
@@ -57,16 +55,12 @@ contains
         integer, intent(in) :: id
         type(NodoImagen), pointer, intent(inout) :: temp
         integer :: alturaRight, alturaLeft, m
-        print *,"LLAMADA RECURSIVA"
         if (.not. associated(temp)) then
-            print *, "Guardando nodo"
             allocate(temp)
             temp%id =  id
             temp%altura = 0
         else if (id < temp%id) then
-            print *, "el valor es menor"
             call this%add_recursivo(id,temp%left)
-            print *, "Se agrego correctamente"
             if ((this%getAltura(temp%left) - this%getAltura(temp%right)) == 2) then
                 if (id < temp%left%id) then
                     temp => this%rsi(temp)
@@ -75,9 +69,7 @@ contains
                 end if
             end if
         else 
-            print *, "El valor es mayor"
             call this%add_recursivo(id,temp%right)
-            print *, "Se agrego correctamente"
             if ((this%getAltura(temp%right) - this%getAltura(temp%left)) == 2) then
                 if (id > temp%right%id) then
                     temp => this%rsd(temp)
@@ -86,7 +78,6 @@ contains
                 end if
             end if
         end if
-        print *,"TERMINO EL CICLO"
         alturaRight = this%getAltura(temp%right)
         alturaLeft = this%getAltura(temp%left)
         m = this%getMax(alturaRight,alturaLeft)
@@ -265,9 +256,7 @@ contains
             ! Imprimir subárbol izquierdo
             call imprimirRecursivos(nodo%left)
             ! Imprimir clave actual del nodo
-            print *, "Imagen:", nodo%id
-            call nodo%arbolCapa%imprimirEnOrden()
-            print *, ""
+            write(*,'(A,I0)') "Imagen: ", nodo%id
             ! Imprimir subárbol derecho
             call imprimirRecursivos(nodo%right)
         end if
@@ -339,6 +328,7 @@ contains
             print *, "El árbol está vacío."
         else
             call this%eliminarNodo(this%raiz, id)
+            print *,"Imagen eliminada del arbol de imagenes"
         endif
     end subroutine eliminar
 
