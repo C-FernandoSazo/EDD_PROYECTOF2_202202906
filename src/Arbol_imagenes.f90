@@ -1,5 +1,5 @@
 module Arbol_Imagenes
-    use Arbol_CapaBss
+    use Arbol_CapaBssss
     implicit none
     ! Arbol AVL
 
@@ -26,6 +26,10 @@ module Arbol_Imagenes
             procedure :: imprimirArbolImg
             procedure :: ingresarCapas
             procedure :: buscarImg
+            procedure :: graficarAVL_BB
+            procedure :: eliminar
+            procedure :: eliminarNodo
+            procedure :: getMin
     end type ArbolImagenes
 
 contains 
@@ -163,7 +167,7 @@ contains
             return
         end if
 
-        write(fileUnit, *) "digraph impresiones {"
+        write(fileUnit, *) "digraph imagenes {"
         if (associated(arbol%raiz)) then
             call escribirNodoRecursivos(arbol%raiz, fileUnit)
         end if
@@ -191,6 +195,59 @@ contains
             call escribirNodoRecursivos(nodo%right, unitNum)
         end if
     end subroutine escribirNodoRecursivos
+
+    !Codigo para graficar el arbol de imagenes pero con el arbol de capas de un nodo en especifico
+    subroutine graficarAVL_BB(arbol,key)
+        class(ArbolImagenes), intent(in) :: arbol
+        integer, intent(in) :: key
+        character(len=12) :: filename = "arbolAVL_BB"
+        integer :: fileUnit, iostat
+
+        character(len=256) :: dotPath, pngPath
+
+        dotPath = 'dot/' // trim(filename) // '.dot'
+        pngPath = 'img/' // trim(adjustl(filename))
+
+        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
+        if (iostat /= 0) then
+            print *, "Error al abrir el archivo."
+            return
+        end if
+
+        write(fileUnit, *) "digraph ALV_BB {"
+        if (associated(arbol%raiz)) then
+            call escribirRecursivo(arbol%raiz, fileUnit,key)
+        end if
+        write(fileunit,*) '}'
+        close(fileUnit)
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')     
+    end subroutine graficarAVL_BB
+
+    recursive subroutine escribirRecursivo(nodo, unitNum, key)
+        type(NodoImagen), pointer, intent(in) :: nodo
+        integer, intent(in) :: unitNum, key
+        integer :: rootCapa
+
+        if (.not. associated(nodo)) return
+
+        ! Escribe el nodo actual
+        write(unitNum,'(I0,A,I0,A)') nodo%id, '[label="Imagen ', nodo%id, '"]'
+        ! Escribe la arista al hijo izquierdo si existe
+        if (nodo%id == key) then
+            rootCapa = nodo%arbolCapa%getRaiz()
+            call nodo%arbolCapa%escribirABB(unitNum)
+            write(unitNum,'(I0,A,I0,A)') nodo%id, ' -> "Capa', rootCapa,'" [color=red];'
+        end if
+        if (associated(nodo%left)) then
+            write(unitNum,*) nodo%id, ' -> ', nodo%left%id
+            call escribirRecursivo(nodo%left, unitNum, key)
+        end if
+        ! Escribe la arista al hijo derecho si existe
+        if (associated(nodo%right)) then
+            write(unitNum,*) nodo%id, ' -> ', nodo%right%id
+            call escribirRecursivo(nodo%right, unitNum, key)
+        end if
+    end subroutine escribirRecursivo
 
     subroutine imprimirArbolImg(arbol)
         class(ArbolImagenes), intent(in) :: arbol
@@ -249,8 +306,6 @@ contains
         type(NodoImagen) ,pointer :: imgEncontrada
 
         imgEncontrada => buscarRecursivoImg(arbol%raiz, key)
-        print *,"MOSTRANDO EL ARBOL ANTES DE SER ENVIADO"
-        call imgEncontrada%arbolCapa%imprimirEnOrden()
     end function buscarImg
 
     ! Subrutina recursiva para buscar un nodo
@@ -273,10 +328,87 @@ contains
             nodoEncontrado => buscarRecursivoImg(nodo%right, key)
         ! Si la clave buscada es igual a la clave del nodo actual, hemos encontrado el nodo
         else
-            print *, "Arbol encontrado dentro del metodo", nodo%id
-            call nodo%arbolCapa%imprimirEnOrden()
             nodoEncontrado => nodo
         end if
     end function buscarRecursivoImg
+    
+    recursive subroutine eliminar(this, id)
+        class(ArbolImagenes), intent(inout) :: this
+        integer, intent(in) :: id
+        if (.not. associated(this%raiz)) then
+            print *, "El árbol está vacío."
+        else
+            call this%eliminarNodo(this%raiz, id)
+        endif
+    end subroutine eliminar
+
+    recursive subroutine eliminarNodo(this, temp, id)
+        class(ArbolImagenes), intent(inout) :: this
+        type(NodoImagen), pointer, intent(inout) :: temp
+        type(NodoImagen), pointer :: tempChild, tempMin
+        integer, intent(in) :: id
+        integer :: alturaRight, alturaLeft, balance
+        if (.not. associated(temp)) then
+            return
+        endif
+    
+        if (id < temp%id) then
+            call this%eliminarNodo(temp%left, id)
+        elseif (id > temp%id) then
+            call this%eliminarNodo(temp%right, id)
+        else
+            if (.not. associated(temp%left) .or. .not. associated(temp%right)) then
+                if (associated(temp%left)) then
+                    tempChild => temp%left
+                else
+                    tempChild => temp%right
+                endif
+                if (.not. associated(tempChild)) then
+                    tempChild => null()
+                    deallocate(temp)
+                else
+                    temp => tempChild
+                endif
+            else
+                tempMin => this%getMin(temp%right)
+                temp%id = tempMin%id
+                call this%eliminarNodo(temp%right, tempMin%id)
+            endif
+        endif
+    
+        if (.not. associated(temp)) then
+            return
+        endif
+    
+        ! Actualizar altura del nodo actual
+        temp%altura = 1 + this%getMax(this%getAltura(temp%left), this%getAltura(temp%right))
+    
+        ! Verificar el balance del nodo actual y realizar las rotaciones necesarias
+        balance = this%getAltura(temp%left) - this%getAltura(temp%right)
+    
+        if (balance > 1) then
+            if (this%getAltura(temp%left%left) >= this%getAltura(temp%left%right)) then
+                temp => this%rsi(temp)
+            else
+                temp => this%rdi(temp)
+            endif
+        elseif (balance < -1) then
+            if (this%getAltura(temp%right%right) >= this%getAltura(temp%right%left)) then
+                temp => this%rsd(temp)
+            else
+                temp => this%rdd(temp)
+            endif
+        endif
+    end subroutine eliminarNodo
+
+    function getMin(this,node) result(minValNode)
+        class(ArbolImagenes), intent(inout) :: this
+        type(NodoImagen), pointer :: node, minValNode
+        minValNode => node
+        do while(associated(minValNode%left))
+            minValNode => minValNode%left
+        end do
+    end function getMin
+
 
 end module Arbol_Imagenes

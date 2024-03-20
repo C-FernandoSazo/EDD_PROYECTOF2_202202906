@@ -2,7 +2,7 @@ program main
   use lecturaJson
   use Arbol_clientes
   use matriz_DispersaI
-  use Arbol_CapaBss
+  use Arbol_CapaBssss
   use Arbol_Imagenes
   use listaAlbum
   implicit none
@@ -12,10 +12,11 @@ program main
   type(ArbolCapas) :: miArbolCapas
   type(ArbolImagenes) :: miArbolImg
   type(lista_album) :: miListaAlbum
-  type(NodoImagen), pointer :: imagenTemp
+  type(NodoImagen), pointer :: imagenTemp, imagenSearch
+  type(Capa) :: capaTemp
   character(len=5) :: opCaracter
   integer :: opcion, opcionAdmin, opcionClient, opcionReportClient, opcionGenImg, limite, opcionLimit
-  integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa
+  integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa, idImg, graph
   character(len=20) :: newNombre, newDPI, newPassword, loginNombre, loginPass
 
   do
@@ -99,75 +100,136 @@ program main
             read (*,*) opcionClient
             select case(opcionClient)
               case(1)
-                call miArbolCapas%graficarABB()
-                call miArbolImg%graficarAVL()
-                call miListaAlbum%graficar_albums()
-              case(2)
                 do
-                  call matriztmp%vaciarMatriz()
-                  print *, "Como te gustaria agregar una nueva imagen"
-                  print *, "1. Por recorrido limitado"
-                  print *, "2. Por arbol de imagenes"
-                  print *, "3. Por capa"
-                  print *, "4. Regresar"
-                  read(*,*) opcionGenImg
-                  select case(opcionGenImg)
+                  print *, "---------Estructuras---------"
+                  print *, "1. Ver Arbol de Imagenes"
+                  print *, "2. Ver Arbol de Capas"
+                  print *, "3. Ver Listado de Albumes"
+                  print *, "4. Ver Capa"
+                  print *, "5. Ver Imagen y Arbol de Capas"
+                  print *, "6. Regresar"
+                  read(*,*) graph
+                  select case(graph)
                     case(1)
-                      print *, "Escoge el recorrido: "
-                      print *, "1. Preorder"
-                      print *, "2. Inorder"
-                      print *, "3. Postorder"
-                      read (*,*) opcionLimit
-                      print *, "Ingresa el limite del recorrido:"
-                      read (*,*) limite
-                      contadorLimite = 0
-                      select case(opcionLimit)
-                        case(1)
-                          call miArbolCapas%preorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
-                        case(2)
-                          call miArbolCapas%inorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
-                        case(3)
-                          call miArbolCapas%postorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
-                        case default
-                          print *, "Selecciona una opcion valida"
-                      end select
-                      call matriztmp%graficarMatrizDispersa()
-                      call matriztmp%generarImagen()
+                      call miArbolImg%graficarAVL()
                     case(2)
+                      call miArbolCapas%graficarABB()
+                    case(3)
+                      call miListaAlbum%graficar_albums()
+                    case(4)
+                      print*,"Capas disponibles:"
+                      call miArbolCapas%imprimirEnOrden()
+                      print*,"Selecciona el id de una capa"
+                      read(*,*) idcapa
+                      print *,idcapa
+                      capaTemp = miArbolCapas%buscarNodo(idcapa)
+                      call capaTemp%matriz%graficarMatrizDispersa()
+                    case(5)
                       print *, "Imagenes disponibles: "
                       call miArbolImg%imprimirArbolImg()
-                      print *, "Selecciona el id de la imagen que deseas visualizar"
-                      read(*,*) amplitud
-                      imagenTemp => miArbolImg%buscarImg(amplitud)
-                      print *, "Arbol encontrado"
-                      call imagenTemp%arbolCapa%graficarABB()
-                      print *, "RECORRIDO EN AMPLITUD"
-                      call imagenTemp%arbolCapa%recorridoAmplitud(matriztmp)
-                      call matriztmp%graficarMatrizDispersa()
-                      call matriztmp%generarImagen()
-                    case(3)
-                      do
-                        print*,"Capas disponibles:"
-                        call miArbolCapas%imprimirEnOrden()
-                        print*,"Selecciona el id de una"
-                        read(*,*) idcapa
-                        call miArbolCapas%apilarMatriz(idcapa,matriztmp)
-                        print *,"Deseas ingresar otra capa? (si/no)"
-                        read (*,*) opCaracter
-                        select case(opCaracter)
-                        case('si')
-                          continue
-                        case('no')
-                          call matriztmp%graficarMatrizDispersa()
-                          call matriztmp%generarImagen()
-                          exit
-                        end select
-                      end do
-                    case(4)
+                      print *, "Selecciona el id de la imagen que deseas visualizar su arbol de capas"
+                      read(*,*) idImg
+                      print *,idImg
+                      call miArbolImg%graficarAVL_BB(idImg)
+                    case(6)
                       exit
                     case default
-                      print *, "Selecciona una opcion valida"
-                    end select
+                      print *,"Selecciona una opcion valida"
+                  end select
+                end do
+              case(2)
+                do
+                  print *,"Gestion de imagenes"
+                  print *,"1. Insertar nueva imagen"
+                  print *,"2. Eliminar imagen"
+                  print *,"3. Regresar"
+                  read (*,*) opcionGenImg
+                  select case(opcionGenImg)
+                  case(1)
+                    do
+                      call matriztmp%vaciarMatriz()
+                      print *, "Como te gustaria generar una nueva imagen"
+                      print *, "1. Por recorrido limitado"
+                      print *, "2. Por arbol de imagenes"
+                      print *, "3. Por capa"
+                      print *, "4. Regresar"
+                      read(*,*) opcionGenImg
+                      select case(opcionGenImg)
+                        case(1)
+                          print *, "Escoge el recorrido: "
+                          print *, "1. Preorder"
+                          print *, "2. Inorder"
+                          print *, "3. Postorder"
+                          read (*,*) opcionLimit
+                          print *, "Ingresa el limite del recorrido:"
+                          read (*,*) limite
+                          contadorLimite = 0
+                          select case(opcionLimit)
+                            case(1)
+                              call miArbolCapas%preorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
+                            case(2)
+                              call miArbolCapas%inorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
+                            case(3)
+                              call miArbolCapas%postorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
+                            case default
+                              print *, "Selecciona una opcion valida"
+                          end select           
+                          call matriztmp%graficarMatrizDispersa()
+                          call matriztmp%generarImagen()
+                        case(2)
+                          print *, "Imagenes disponibles: "
+                          call miArbolImg%imprimirArbolImg()
+                          print *, "Selecciona el id de la imagen que deseas visualizar"
+                          read(*,*) amplitud
+                          imagenTemp => miArbolImg%buscarImg(amplitud)
+                          print *, "Arbol encontrado"
+                          call imagenTemp%arbolCapa%graficarABB()
+                          print *, "RECORRIDO EN AMPLITUD"
+                          call imagenTemp%arbolCapa%recorridoAmplitud(matriztmp)
+                          call matriztmp%graficarMatrizDispersa()
+                          call matriztmp%generarImagen()
+                        case(3)
+                          print *,"Con que id deseas guardar tu imagen (solo valores numericos)"
+                          read(*,*) idImg
+                          imagenSearch => miArbolImg%buscarImg(idImg)
+                          if (.not. associated(imagenSearch)) then
+                            call miArbolImg%insertar(idImg)
+                            do
+                              print*,"Capas disponibles:"
+                              call miArbolCapas%imprimirEnOrden()
+                              print*,"Selecciona el id de una capa"
+                              read(*,*) idcapa
+                              capaTemp = miArbolCapas%buscarNodo(idcapa)
+                              call miArbolCapas%apilarMatriz(idcapa,matriztmp)
+                              call miArbolImg%ingresarCapas(idImg,capaTemp%key,capaTemp%matriz)
+                              print *,"Deseas ingresar otra capa? (si/no)"
+                              read (*,*) opCaracter
+                              select case(opCaracter)
+                              case('si')
+                                continue
+                              case('no')
+                                print *,"Imagen guardada con exito"
+                                call matriztmp%graficarMatrizDispersa()
+                                call matriztmp%generarImagen()
+                                exit
+                              end select
+                            end do
+                          else 
+                            print *,"El id ingresado ya existe, selecciona otro"
+                          end if
+                        case(4)
+                          exit
+                        case default
+                          print *, "Selecciona una opcion valida"
+                        end select
+                    end do
+                  case(2)
+                    print *,"Selecciona el id de la imagen que deseas eliminar"
+                    read (*,*) idImg
+                    call miArbolImg%eliminar(idImg)
+                  case(3)
+                    exit
+                  end select
                 end do
               case(3)
                 call leerCapas(miArbolCapas, &

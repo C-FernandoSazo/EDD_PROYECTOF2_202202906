@@ -1,27 +1,29 @@
- digraph impresiones {
-6[label="Capa 6"]
-           6  ->            5
-5[label="Capa 5"]
-           5  ->            4
-4[label="Capa 4"]
-           4  ->            3
-3[label="Capa 3"]
-           3  ->            2
-2[label="Capa 2"]
-           2  ->            1
-1[label="Capa 1"]
-           1  ->            0
-0[label="Capa 0"]
-           6  ->            7
-7[label="Capa 7"]
-           7  ->            8
-8[label="Capa 8"]
-           8  ->            9
-9[label="Capa 9"]
-           9  ->           10
-10[label="Capa 10"]
-          10  ->           11
-11[label="Capa 11"]
-          11  ->           12
-12[label="Capa 12"]
+ digraph capas {
+"Capa7" [label="Capa 7"]
+"Capa7" -> "Capa3"
+"Capa3" [label="Capa 3"]
+"Capa3" -> "Capa1"
+"Capa1" [label="Capa 1"]
+"Capa1" -> "Capa0"
+"Capa0" [label="Capa 0"]
+"Capa1" -> "Capa2"
+"Capa2" [label="Capa 2"]
+"Capa3" -> "Capa4"
+"Capa4" [label="Capa 4"]
+"Capa4" -> "Capa5"
+"Capa5" [label="Capa 5"]
+"Capa5" -> "Capa6"
+"Capa6" [label="Capa 6"]
+"Capa7" -> "Capa10"
+"Capa10" [label="Capa 10"]
+"Capa10" -> "Capa9"
+"Capa9" [label="Capa 9"]
+"Capa9" -> "Capa8"
+"Capa8" [label="Capa 8"]
+"Capa10" -> "Capa11"
+"Capa11" [label="Capa 11"]
+"Capa11" -> "Capa12"
+"Capa12" [label="Capa 12"]
+"Capa12" -> "Capa15"
+"Capa15" [label="Capa 15"]
  }

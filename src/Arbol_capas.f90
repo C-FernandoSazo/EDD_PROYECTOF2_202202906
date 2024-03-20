@@ -1,4 +1,4 @@
-module Arbol_CapaBss
+module Arbol_CapaBssss
     use matriz_DispersaI
     implicit none
     ! Arbol Binario de Busqueda ABB
@@ -21,6 +21,7 @@ module Arbol_CapaBss
             procedure :: insertarNodoConMatriz
             procedure :: imprimirEnOrden
             procedure :: graficarABB
+            procedure :: escribirABB
             procedure :: buscarNodo
             procedure :: ingresarMatriz
             procedure :: preorder
@@ -33,6 +34,7 @@ module Arbol_CapaBss
             procedure :: postorderLimit
             procedure :: recorridoAmplitud
             procedure :: apilarMatriz
+            procedure :: getRaiz
     end type ArbolCapas
 
 contains 
@@ -138,7 +140,7 @@ contains
             return
         end if
 
-        write(fileUnit, *) "digraph impresiones {"
+        write(fileUnit, *) "digraph capas {"
         if (associated(arbol%raiz)) then
             call escribirNodoRecursivo(arbol%raiz, fileUnit)
         end if
@@ -147,6 +149,18 @@ contains
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
     end subroutine graficarABB
 
+    subroutine escribirABB(arbol,fileUnit)
+        class(ArbolCapas), intent(in) :: arbol
+        integer, intent(in) :: fileUnit
+
+        write(fileUnit, *) "subgraph capas {"
+        write(fileUnit, *) "node [shape=circle];"
+        if (associated(arbol%raiz)) then
+            call escribirNodoRecursivo(arbol%raiz, fileUnit)
+        end if
+        write(fileunit,*) '}'
+    end subroutine escribirABB
+
     recursive subroutine escribirNodoRecursivo(nodo, unitNum)
         type(NodoCapa), pointer, intent(in) :: nodo
         integer, intent(in) :: unitNum
@@ -154,15 +168,15 @@ contains
         if (.not. associated(nodo)) return
 
         ! Escribe el nodo actual
-        write(unitNum,'(I0,A,I0,A)') nodo%capa%key, '[label="Capa ', nodo%capa%key, '"]'
+        write(unitNum,'(A,I0,A,I0,A)') '"Capa',nodo%capa%key, '" [label="Capa ', nodo%capa%key, '"]'
         ! Escribe la arista al hijo izquierdo si existe
         if (associated(nodo%left)) then
-            write(unitNum,*) nodo%capa%key, ' -> ', nodo%left%capa%key
+            write(unitNum,'(A,I0,A,I0,A)') '"Capa', nodo%capa%key, '" -> "Capa', nodo%left%capa%key,'"'
             call escribirNodoRecursivo(nodo%left, unitNum)
         end if
         ! Escribe la arista al hijo derecho si existe
         if (associated(nodo%right)) then
-            write(unitNum,*) nodo%capa%key, ' -> ', nodo%right%capa%key
+            write(unitNum,'(A,I0,A,I0,A)') '"Capa', nodo%capa%key, '" -> "Capa', nodo%right%capa%key,'"'
             call escribirNodoRecursivo(nodo%right, unitNum)
         end if
     end subroutine escribirNodoRecursivo
@@ -468,5 +482,11 @@ contains
             end do
         end if
     end subroutine apilarRecursivo
+
+    function getRaiz(arbol) result(raiz)
+        class(ArbolCapas), intent(in) :: arbol
+        integer :: raiz
+        raiz = arbol%raiz%capa%key
+    end function getRaiz
         
-end module Arbol_CapaBss
+end module Arbol_CapaBssss

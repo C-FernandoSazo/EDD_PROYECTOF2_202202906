@@ -2,7 +2,7 @@ module lecturaJson
     use json_module
     use Arbol_clientes
     use matriz_DispersaI
-    use Arbol_CapaBss
+    use Arbol_CapaBssss
     implicit none
 contains
 
