@@ -1,4 +1,4 @@
-module Arbol_CapaBssss
+module Arbol_CapaBB
     use matriz_DispersaI
     implicit none
     ! Arbol Binario de Busqueda ABB
@@ -35,6 +35,7 @@ module Arbol_CapaBssss
             procedure :: recorridoAmplitud
             procedure :: apilarMatriz
             procedure :: getRaiz
+            procedure :: contarCapas
     end type ArbolCapas
 
 contains 
@@ -127,7 +128,7 @@ contains
 
     subroutine graficarABB(arbol)
         class(ArbolCapas), intent(in) :: arbol
-        character(len=12) :: filename = "arbolABB"
+        character(len=12) :: filename = "arbolCapas"
         integer :: fileUnit, iostat
         character(len=256) :: dotPath, pngPath
 
@@ -323,18 +324,20 @@ contains
         end if
     end subroutine imprimirHojasRecursivo
 
-    subroutine preorderLimit(this, tmp, limit, contador, matriz) 
+    subroutine preorderLimit(this, tmp, limit, contador, matriz, capasTemp) 
         class(ArbolCapas), intent(in) :: this
         type(NodoCapa), intent(in), pointer :: tmp
         type(nodo_matriz), pointer :: nodoActual, filaActual
         integer, intent(in) :: limit
         integer, intent(inout) :: contador 
         type(matrizDispersa), intent(inout) :: matriz
+        type(ArbolCapas), intent(inout) :: capasTemp
         if( .not. associated(tmp)) then
             return
         end if
         if (contador /= limit) then
             contador = contador + 1
+            call capasTemp%insertarNodoConMatriz(tmp%capa%key, tmp%capa%matriz)
             filaActual => tmp%capa%matriz%head%down
             do while (associated(filaActual))
                 nodoActual => filaActual%right
@@ -345,25 +348,27 @@ contains
                 end do
                 filaActual => filaActual%down
             end do
-            call this%preorderLimit(tmp%left,limit,contador,matriz)
-            call this%preorderLimit(tmp%right,limit,contador,matriz)
+            call this%preorderLimit(tmp%left,limit,contador,matriz, capasTemp)
+            call this%preorderLimit(tmp%right,limit,contador,matriz, capasTemp)
         end if
     end subroutine preorderLimit
 
-    subroutine inorderLimit(this, tmp, limit, contador, matriz)
+    subroutine inorderLimit(this, tmp, limit, contador, matriz, capasTemp)
         class(ArbolCapas), intent(in) :: this
         type(NodoCapa), intent(in), pointer :: tmp
         type(nodo_matriz), pointer :: filaActual, nodoActual
         integer, intent(in) :: limit
         integer, intent(inout) :: contador 
         type(matrizDispersa), intent(inout) :: matriz
+        type(ArbolCapas), intent(inout) :: capasTemp
         
         if( .not. associated(tmp)) then
             return
         end if
-        call this%inorderLimit(tmp%left,limit,contador,matriz)
+        call this%inorderLimit(tmp%left,limit,contador,matriz, capasTemp)
         if (contador /= limit) then
             contador = contador + 1
+            call capasTemp%insertarNodoConMatriz(tmp%capa%key, tmp%capa%matriz)
             filaActual => tmp%capa%matriz%head%down
             do while (associated(filaActual))
                 nodoActual => filaActual%right
@@ -375,24 +380,26 @@ contains
                 filaActual => filaActual%down
             end do
         end if
-        call this%inorderLimit(tmp%right,limit,contador,matriz)
+        call this%inorderLimit(tmp%right,limit,contador,matriz, capasTemp)
     end subroutine inorderLimit
 
-    subroutine postorderLimit(this, tmp, limit, contador, matriz)
+    subroutine postorderLimit(this, tmp, limit, contador, matriz, capasTemp)
         class(ArbolCapas), intent(in) :: this
         type(NodoCapa), intent(in), pointer :: tmp
         type(nodo_matriz), pointer :: filaActual, nodoActual
         integer, intent(in) :: limit
         integer, intent(inout) :: contador 
         type(matrizDispersa), intent(inout) :: matriz
+        type(ArbolCapas), intent(inout) :: capasTemp
         
         if( .not. associated(tmp)) then
             return
         end if
-        call this%postorderLimit(tmp%left,limit,contador,matriz)
-        call this%postorderLimit(tmp%right,limit,contador,matriz)
+        call this%postorderLimit(tmp%left,limit,contador,matriz,capasTemp)
+        call this%postorderLimit(tmp%right,limit,contador,matriz,capasTemp)
         if (contador /= limit) then
             contador = contador + 1
+            call capasTemp%insertarNodoConMatriz(tmp%capa%key, tmp%capa%matriz)
             filaActual => tmp%capa%matriz%head%down
             do while (associated(filaActual))
                 nodoActual => filaActual%right
@@ -488,5 +495,24 @@ contains
         integer :: raiz
         raiz = arbol%raiz%capa%key
     end function getRaiz
+
+    function contarCapas(this) result(numNodos)
+        class(ArbolCapas), intent(in) :: this
+        integer :: numNodos
+
+        numNodos = contarRecursivoCapa(this%raiz)
+    end function contarCapas
+
+    ! Función auxiliar recursiva para contar nodos
+    recursive function contarRecursivoCapa(nodo) result(contador)
+        type(NodoCapa), pointer, intent(in) :: nodo
+        integer :: contador
+
+        if (.not. associated(nodo)) then
+            contador = 0
+        else
+            contador = 1 + contarRecursivoCapa(nodo%left) + contarRecursivoCapa(nodo%right)
+        end if
+    end function contarRecursivoCapa
         
-end module Arbol_CapaBssss
+end module Arbol_CapaBB

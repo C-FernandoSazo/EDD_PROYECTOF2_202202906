@@ -1,5 +1,5 @@
-module Arbol_Imagenes
-    use Arbol_CapaBssss
+module Arbol_ImagenesAVLs
+    use Arbol_CapaBB
     implicit none
     ! Arbol AVL
 
@@ -30,6 +30,9 @@ module Arbol_Imagenes
             procedure :: eliminar
             procedure :: eliminarNodo
             procedure :: getMin
+            procedure :: contarImagenes
+            procedure :: top5Img
+            procedure :: agregarArbolCapa
     end type ArbolImagenes
 
 contains 
@@ -144,7 +147,7 @@ contains
 
     subroutine graficarAVL(arbol)
         class(ArbolImagenes), intent(in) :: arbol
-        character(len=12) :: filename = "arbolAVL"
+        character(len=13) :: filename = "arbolImagenes"
         integer :: fileUnit, iostat
 
         character(len=256) :: dotPath, pngPath
@@ -191,7 +194,7 @@ contains
     subroutine graficarAVL_BB(arbol,key)
         class(ArbolImagenes), intent(in) :: arbol
         integer, intent(in) :: key
-        character(len=12) :: filename = "arbolAVL_BB"
+        character(len=14) :: filename = "Imagenes-capa"
         integer :: fileUnit, iostat
 
         character(len=256) :: dotPath, pngPath
@@ -400,5 +403,112 @@ contains
         end do
     end function getMin
 
+    function contarImagenes(this) result(numNodos)
+        class(ArbolImagenes), intent(in) :: this
+        integer :: numNodos
 
-end module Arbol_Imagenes
+        numNodos = contarRecursivo(this%raiz)
+    end function contarImagenes
+
+    ! Función auxiliar recursiva para contar nodos
+    recursive function contarRecursivo(nodo) result(contador)
+        type(NodoImagen), pointer, intent(in) :: nodo
+        integer :: contador
+
+        if (.not. associated(nodo)) then
+            contador = 0
+        else
+            contador = 1 + contarRecursivo(nodo%left) + contarRecursivo(nodo%right)
+        end if
+    end function contarRecursivo
+
+    subroutine top5Img(this)
+        class(ArbolImagenes), intent(in) :: this
+        integer :: top1Id, top2Id, top3Id, top4Id, top5Id
+        integer :: top1Capas, top2Capas, top3Capas, top4Capas, top5Capas
+    
+        top1Id = 0; top2Id = 0; top3Id = 0; top4Id = 0; top5Id = 0
+        top1Capas = 0; top2Capas = 0; top3Capas = 0; top4Capas = 0; top5Capas = 0
+    
+        call topRecursivo(this%raiz, top1Id, top2Id, top3Id, top4Id, top5Id, &
+                        top1Capas, top2Capas, top3Capas, top4Capas, top5Capas)
+    
+        print *, "Top 5 imagenes con mas numero de capas:"
+        if (top1Capas > 0) print *, "1. Imagen ID:", top1Id, "Capas:", top1Capas
+        if (top2Capas > 0) print *, "2. Imagen ID:", top2Id, "Capas:", top2Capas
+        if (top3Capas > 0) print *, "3. Imagen ID:", top3Id, "Capas:", top3Capas
+        if (top4Capas > 0) print *, "4. Imagen ID:", top4Id, "Capas:", top4Capas
+        if (top5Capas > 0) print *, "5. Imagen ID:", top5Id, "Capas:", top5Capas
+    end subroutine top5Img
+    
+    recursive subroutine topRecursivo(nodo, top1Id, top2Id, top3Id, top4Id, top5Id, &
+        top1Capas, top2Capas, top3Capas, top4Capas, top5Capas)
+        type(NodoImagen), pointer, intent(in) :: nodo
+        integer, intent(inout) :: top1Id, top2Id, top3Id, top4Id, top5Id
+        integer, intent(inout) :: top1Capas, top2Capas, top3Capas, top4Capas, top5Capas
+        integer :: currentCapas
+
+        if (.not. associated(nodo)) return
+
+        currentCapas = nodo%arbolCapa%contarCapas() 
+
+        if (currentCapas > top1Capas) then
+        top5Id = top4Id; top5Capas = top4Capas
+        top4Id = top3Id; top4Capas = top3Capas
+        top3Id = top2Id; top3Capas = top2Capas
+        top2Id = top1Id; top2Capas = top1Capas
+        top1Id = nodo%id; top1Capas = currentCapas
+        else if (currentCapas > top2Capas) then
+        top5Id = top4Id; top5Capas = top4Capas
+        top4Id = top3Id; top4Capas = top3Capas
+        top3Id = top2Id; top3Capas = top2Capas
+        top2Id = nodo%id; top2Capas = currentCapas
+        else if (currentCapas > top3Capas) then
+        top5Id = top4Id; top5Capas = top4Capas
+        top4Id = top3Id; top4Capas = top3Capas
+        top3Id = nodo%id; top3Capas = currentCapas
+        else if (currentCapas > top4Capas) then
+        top5Id = top4Id; top5Capas = top4Capas
+        top4Id = nodo%id; top4Capas = currentCapas
+        else if (currentCapas > top5Capas) then
+        top5Id = nodo%id; top5Capas = currentCapas
+        end if
+
+        call topRecursivo(nodo%left, top1Id, top2Id, top3Id, top4Id, top5Id, &
+        top1Capas, top2Capas, top3Capas, top4Capas, top5Capas)
+        call topRecursivo(nodo%right, top1Id, top2Id, top3Id, top4Id, top5Id, &
+        top1Capas, top2Capas, top3Capas, top4Capas, top5Capas)
+        end subroutine topRecursivo
+
+        subroutine agregarArbolCapa(arbol, key, capaTemp) 
+            class(ArbolImagenes), intent(in) :: arbol
+            integer, intent(in) :: key
+            type(ArbolCapas), intent(in) :: capaTemp
+    
+            call agregarArbolCapaRecursivo(arbol%raiz,key,capaTemp)
+        end subroutine agregarArbolCapa
+    
+        ! Subrutina recursiva para buscar un nodo
+        recursive subroutine agregarArbolCapaRecursivo(nodo, key, capaTemp) 
+            type(NodoImagen), pointer, intent(in) :: nodo
+            integer, intent(in) :: key
+            type(ArbolCapas), intent(in) :: capaTemp
+    
+            ! Si el nodo actual es nulo, no se encontró el nodo buscado
+            if (.not. associated(nodo)) then
+                return
+            end if
+    
+            ! Si la clave buscada es menor que la clave del nodo actual, buscar en el subárbol izquierdo
+            if (key < nodo%id) then
+                call agregarArbolCapaRecursivo(nodo%left,key,capaTemp)
+            ! Si la clave buscada es mayor que la clave del nodo actual, buscar en el subárbol derecho
+            else if (key > nodo%id) then
+                call agregarArbolCapaRecursivo(nodo%right,key,capaTemp)
+            ! Si la clave buscada es igual a la clave del nodo actual, hemos encontrado el nodo
+            else
+                nodo%arbolCapa = capaTemp
+            end if
+        end subroutine agregarArbolCapaRecursivo
+
+end module Arbol_ImagenesAVLs

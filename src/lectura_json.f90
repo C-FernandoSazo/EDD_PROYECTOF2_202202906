@@ -2,7 +2,7 @@ module lecturaJson
     use json_module
     use Arbol_clientes
     use matriz_DispersaI
-    use Arbol_CapaBssss
+    use Arbol_CapaBB
     implicit none
 contains
 
@@ -137,7 +137,7 @@ contains
     end subroutine leerCapas
 
     subroutine leerImagenes(arbol, miArbolCapas, filename)
-        use Arbol_Imagenes
+        use Arbol_ImagenesAVLs
         type(ArbolImagenes), intent(inout) :: arbol
         character(len=*), intent(in) :: filename
         type(ArbolCapas), intent(inout) :: miArbolCapas
@@ -194,7 +194,7 @@ contains
     end subroutine leerImagenes
 
     subroutine leerAlbumes(miListaAlbum, filename)
-        use listaAlbums
+        use listaAlbumss
         type(lista_album), intent(inout) :: miListaAlbum
         character(len=*), intent(in) :: filename
         type(json_file) :: json

@@ -1,7 +1,7 @@
 module Arbol_clientes
-    use Arbol_CapaBssss
-    use Arbol_Imagenes
-    use listaAlbums
+    use Arbol_CapaBB
+    use Arbol_ImagenesAVLs
+    use listaAlbumss
     implicit none
 
     integer, parameter :: MAXI = 4, MINI = 2 
@@ -39,6 +39,7 @@ module Arbol_clientes
             procedure :: imprimirClientes
             procedure :: modificarCliente
             procedure :: actualizarEstructuras
+            procedure :: buscarID
     end type ArbolClientes
 
 contains
@@ -235,8 +236,8 @@ contains
         end if
 
         do i = 1, nodo%num
-            write (*,'(I0,A,A,A,A)') nodo%cliente(i)%id,". Nombre: ", trim(nodo%cliente(i)%nombre), &
-            ", DPI: ", nodo%cliente(i)%dpi
+            write (*,'(A,I0,A,A,A,I0,A,I0)') 'ID: ',nodo%cliente(i)%id,". Nombre: ", trim(nodo%cliente(i)%nombre), &
+            ", DPI: ", nodo%cliente(i)%dpi, ' Cantidad de imagenes: ',nodo%cliente(i)%miArbolImg%contarImagenes()
         end do
     
         do i = 0, nodo%num
@@ -309,6 +310,38 @@ contains
             call actualizarRecursivo(nodo%link(i)%ptr,dpi,client)
         end do
     end subroutine actualizarRecursivo
+
+    function buscarID(this, id) result(clienteEncontrado)
+        class(ArbolClientes), intent(in) :: this
+        integer, intent(in) :: id
+        type(Cliente), pointer :: clienteEncontrado 
+        type(BTreeNode), pointer :: actual
+        clienteEncontrado%nombre = "0"
+        actual => this%root
+        call buscarRecursivoID(actual, id, clienteEncontrado)
+    end function buscarID
+    
+    recursive subroutine buscarRecursivoID(nodo, id, clienteEncontrado)
+        type(BTreeNode), pointer, intent(in) :: nodo
+        integer, intent(in) :: id
+        type(Cliente), pointer, intent(inout) :: clienteEncontrado
+        integer :: i
+    
+        if (.not. associated(nodo)) then
+            return
+        end if
+    
+        do i = 1, nodo%num
+            if (nodo%cliente(i)%id == id) then
+                clienteEncontrado => nodo%cliente(i)
+                return
+            end if
+        end do
+    
+        do i = 0, nodo%num
+            call buscarRecursivoID(nodo%link(i)%ptr, id, clienteEncontrado)
+        end do
+    end subroutine buscarRecursivoID
     
     
 end module Arbol_clientes

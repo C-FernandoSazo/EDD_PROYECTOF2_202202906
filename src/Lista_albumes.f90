@@ -1,4 +1,4 @@
-module listaAlbums
+module listaAlbumss
     use listaImagen
     implicit none
 
@@ -17,6 +17,7 @@ module listaAlbums
             procedure :: deleteImagen
             procedure :: mostrarAlbum
             procedure :: graficar_albums
+            procedure :: conteoAlbumImg
     end type lista_album
 
 contains 
@@ -143,4 +144,25 @@ contains
         print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.png'
     end subroutine graficar_albums
 
-end module listaAlbums
+    subroutine conteoAlbumImg(lista)
+        class(lista_album), intent(in) :: lista
+        type(NodoAlbum), pointer :: actual
+        type(NodoLimagen), pointer :: imgActual
+        integer :: contAlbum = 0, contImg = 0
+
+        actual => lista%head
+        do while(associated(actual))
+            contAlbum = contAlbum + 1
+                imgActual => actual%listImagenes%head
+                do while(associated(imgActual))
+                    contImg =  contImg + 1
+                    imgActual => imgActual%siguiente
+                end do
+            actual => actual%siguiente
+        end do
+
+        write(*,'(A,I0)') 'El total de albumes del cliente es: ', contAlbum
+        write(*,'(A,I0)') 'El total de de imagenes en los albums del cliente es: ', contImg
+    end subroutine
+
+end module listaAlbumss

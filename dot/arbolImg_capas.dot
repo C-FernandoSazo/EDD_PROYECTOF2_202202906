@@ -1,0 +1,24 @@
+ digraph ALV_BB {
+5[label="Imagen 5"]
+ subgraph capas {
+ node [shape=circle];
+"Capa0" [label="Capa 0"]
+"Capa0" -> "Capa8"
+"Capa8" [label="Capa 8"]
+"Capa8" -> "Capa6"
+"Capa6" [label="Capa 6"]
+"Capa8" -> "Capa9"
+"Capa9" [label="Capa 9"]
+"Capa9" -> "Capa10"
+"Capa10" [label="Capa 10"]
+"Capa10" -> "Capa11"
+"Capa11" [label="Capa 11"]
+"Capa11" -> "Capa12"
+"Capa12" [label="Capa 12"]
+ }
+5 -> "Capa0" [color=red];
+           5  ->            1
+1[label="Imagen 1"]
+           5  ->            6
+6[label="Imagen 6"]
+ }

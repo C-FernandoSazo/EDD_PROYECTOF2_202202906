@@ -2,21 +2,21 @@ program main
   use lecturaJson
   use Arbol_clientes
   use matriz_DispersaI
-  use Arbol_CapaBssss
-  use Arbol_Imagenes
-  use listaAlbums
+  use Arbol_CapaBB
+  use Arbol_ImagenesAVLs
+  use listaAlbumss
   implicit none
   Type(ArbolClientes) :: miArbolClientes
-  Type(Cliente) :: clienteTemp, newCliente
+  Type(Cliente) :: clienteTemp, newCliente, clienteSearch
   type(matrizDispersa) :: matriztmp
-  type(ArbolCapas) :: miArbolCapas
+  type(ArbolCapas) :: miArbolCapas, capasTemp
   type(ArbolImagenes) :: miArbolImg
   type(lista_album) :: miListaAlbum
   type(NodoImagen), pointer :: imagenTemp, imagenSearch
   type(Capa) :: capaTemp
   character(len=5) :: opCaracter
-  integer :: opcion, opcionAdmin, opcionClient, opcionReportClient, opcionGenImg, limite, opcionLimit
-  integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa, idImg, graph
+  integer :: opcion, opcionAdmin, opcionClient, opcionReportClient, opcionGenImg, limite, opcionLimit, numCapas
+  integer :: contadorLimite, opcionOPClient, clientModificar, profundidad, amplitud, idcapa, idImg, graph, nImg
   integer(8) ::  newDPI
   character(len=20) :: newNombre, newPassword, loginNombre, loginPass
   character(len=100) :: rutaArchivo
@@ -42,7 +42,8 @@ program main
             print *, "1. Arbol B de usuarios"
             print *, "2. Operaciones sobre los usuarios"
             print *, "3. Carga Masiva de Usuarios"
-            print *, "4. Cerrar Sesion"
+            print *, "4. Reportes de Clientes"
+            print *, "5. Cerrar Sesion"
             read (*,*) opcionAdmin
             select case(opcionAdmin)
               case(1)
@@ -85,6 +86,35 @@ program main
                 call leerClientes(miArbolClientes,rutaArchivo)
                 print *, "Se han agregado los clientes correctamente"
               case(4)
+                print *, "1. Buscar Cliente"
+                print *, "2. Listar Clientes"
+                print *, "3. Regresar"
+                read(*,*) opcionOPClient
+                select case(opcionOPClient)
+                  case(1)
+                    print *, "Selecciona el id del cliente que deseas ver su informacion"
+                    call miArbolClientes%imprimirClientes()
+                    read(*,*) opcionOPClient
+                    clienteSearch = miArbolClientes%buscarID(opcionOPClient)
+                    if (clienteSearch%nombre /= "0") then
+                      print *,"Imprimiendo información del usuario: "
+                      write(*,'(A,A,A,I0,A,A)')'Nombre: ',clienteSearch%nombre, ' DPI: ', clienteSearch%dpi, ' Password: ', &
+                      clienteSearch%password
+                      call clienteSearch%miListaAlbum%conteoAlbumImg()
+                      nImg = clienteSearch%miArbolImg%contarImagenes()
+                      write(*,'(A,I0,A)') 'La cantidad de imagenes totales es: ', nImg, ' imagenes'
+                      numCapas = clienteSearch%miArbolCapas%contarCapas()
+                      write(*,'(A,I0,A)') 'La cantidad de capas totales es: ', numCapas, ' capas'
+                    else 
+                      print *, "Cliente no encontrado"
+                    end if
+                  case(2)
+                    print *,"Listado de clientes registrados:"
+                    call miArbolClientes%imprimirClientes()
+                  case default 
+                    print *,"Selecciona alguna opción valida"
+                end select
+              case(5)
                 exit
               case default
                 print *, "Selecciona algun valor que este en el menu"
@@ -146,7 +176,7 @@ program main
               case(2)
                 do
                   print *,"Gestion de imagenes"
-                  print *,"1. Insertar nueva imagen"
+                  print *,"1. Generar nueva imagen"
                   print *,"2. Eliminar imagen"
                   print *,"3. Regresar"
                   read (*,*) opcionGenImg
@@ -170,17 +200,26 @@ program main
                           print *, "Ingresa el limite del recorrido:"
                           read (*,*) limite
                           contadorLimite = 0
-                          select case(opcionLimit)
-                            case(1)
-                              call miArbolCapas%preorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
-                            case(2)
-                              call miArbolCapas%inorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
-                            case(3)
-                              call miArbolCapas%postorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp)
-                            case default
-                              print *, "Selecciona una opcion valida"
-                          end select           
-                          call matriztmp%generarImagen()
+                          print *,"Con que id deseas guardar tu imagen (solo valores numericos)"
+                          read(*,*) idImg
+                          imagenSearch => miArbolImg%buscarImg(idImg)
+                          if (.not. associated(imagenSearch)) then
+                            call miArbolImg%insertar(idImg)
+                            select case(opcionLimit)
+                              case(1)
+                                call miArbolCapas%preorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp,capasTemp)
+                              case(2)
+                                call miArbolCapas%inorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp,capasTemp)
+                              case(3)
+                                call miArbolCapas%postorderLimit(miArbolCapas%raiz,limite,contadorLimite,matriztmp,capasTemp)
+                              case default
+                                print *, "Selecciona una opcion valida"
+                            end select   
+                            call miArbolImg%agregarArbolCapa(idImg,capasTemp)        
+                            call matriztmp%generarImagen()
+                          else 
+                            print *,"El id ingresado ya existe, selecciona otro"
+                          end if
                         case(2)
                           print *, "Imagenes disponibles: "
                           call miArbolImg%imprimirArbolImg()
@@ -256,6 +295,7 @@ program main
                   read (*,*) opcionReportClient
                   select case(opcionReportClient)
                     case(1)
+                      call miArbolImg%top5Img()
                     case(2)
                       call miArbolCapas%imprimirHojas()
                     case(3)

@@ -267,7 +267,7 @@ contains
     
     subroutine graficarMatrizDispersa(self)
         class(matrizDispersa), intent(inout) :: self  
-        character(len=18) :: filename = "matrizDispersa"
+        character(len=18) :: filename = "capaLogico"
         integer :: i, j, fileUnit, iostat
         type(nodo_matriz), pointer :: aux
         type(nodovalor) :: val
