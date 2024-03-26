@@ -161,13 +161,15 @@ contains
             return
         end if
 
+        print *,"Generando Arbol de Imagenes..."
         write(fileUnit, *) "graph imagenes {"
         if (associated(arbol%raiz)) then
             call escribirNodoRecursivos(arbol%raiz, fileUnit)
         end if
         write(fileunit,*) '}'
         close(fileUnit)
-        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')    
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')  
+        print *,"Arbol de Imagenes graficado con exito" 
         call system('start ' // trim(adjustl(pngPath)) // '.png') 
     end subroutine graficarAVL
 
@@ -209,6 +211,7 @@ contains
             return
         end if
 
+        print *,"Generando Arbol de Imagenes con Capas..."
         write(fileUnit, *) "graph ALV_BB {"
         if (associated(arbol%raiz)) then
             call escribirRecursivo(arbol%raiz, fileUnit,key)
@@ -216,6 +219,7 @@ contains
         write(fileunit,*) '}'
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')     
+        print *,"Arbol de Imagenes con Capas graficado con exito"   
         call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficarAVL_BB
 

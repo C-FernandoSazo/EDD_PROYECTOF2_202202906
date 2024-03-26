@@ -98,6 +98,7 @@ contains
             return
         end if
     
+        print *,"Generando Lista de Albums..."
         write(fileUnit, *) "digraph albums {"
         write(fileUnit, *) "    rankdir=LR;"
         write(fileUnit, *) "    node [shape=record];"
@@ -142,6 +143,7 @@ contains
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
         print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.png'
+        print *,"Lista de Albums graficada con exito"
         call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficar_albums
 

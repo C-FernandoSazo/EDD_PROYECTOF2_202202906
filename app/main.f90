@@ -105,12 +105,14 @@ program main
                       write(*,'(A,I0,A)') 'La cantidad de imagenes totales es: ', nImg, ' imagenes'
                       numCapas = clienteSearch%miArbolCapas%contarCapas()
                       write(*,'(A,I0,A)') 'La cantidad de capas totales es: ', numCapas, ' capas'
+                      print *, ""
                     else 
                       print *, "Cliente no encontrado"
                     end if
                   case(2)
                     print *,"Listado de clientes registrados:"
                     call miArbolClientes%imprimirClientes()
+                    print *, ""
                   case default 
                     print *,"Selecciona alguna opción valida"
                 end select
@@ -296,11 +298,14 @@ program main
                   select case(opcionReportClient)
                     case(1)
                       call miArbolImg%top5Img()
+                      print *, ""
                     case(2)
                       call miArbolCapas%imprimirHojas()
+                      print *, ""
                     case(3)
                       profundidad =  miArbolCapas%calcularProfundidad()
                       write(*,'(A,I0)') "La profundidad del arbol es: ",profundidad
+                      print *, ""
                     case(4)
                       print *, "Recorrido Preorder"
                       call miArbolCapas%preorder(miArbolCapas%raiz)

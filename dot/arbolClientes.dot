@@ -1,8 +1,8 @@
  graph clientes {
      node [shape=record];
-"Cliente4" [label="Cliente 4: Maria Garcia DPI: 1256789012345\n"]
-"Cliente4" -- "Cliente2"
-"Cliente2" [label="Cliente 2: Farruko Pop DPI: 1234567890123\nCliente 1: AUX_EDD DPI: 1234567890124\n"]
-"Cliente4" -- "Cliente3"
-"Cliente3" [label="Cliente 3: Juan Perez DPI: 1345678901234\nCliente 6: Luisa Fernanda DPI: 5678901234567\nCliente 5: Carlos Soto DPI: 6567890123456\n"]
+"Cliente2" [label="Cliente 2: AUX_EDD DPI: 1234567890124\n"]
+"Cliente2" -- "Cliente1"
+"Cliente1" [label="Cliente 1: a DPI: 342\nCliente 3: Farruko Pop DPI: 1234567890123\n"]
+"Cliente2" -- "Cliente5"
+"Cliente5" [label="Cliente 5: Maria Garcia DPI: 1256789012345\nCliente 4: Juan Perez DPI: 1345678901234\nCliente 7: Luisa Fernanda DPI: 5678901234567\nCliente 6: Carlos Soto DPI: 6567890123456\n"]
  }

@@ -141,6 +141,7 @@ contains
             return
         end if
 
+        print *,"Generando Arbol de Capas..."
         write(fileUnit, *) "graph capas {"
         if (associated(arbol%raiz)) then
             call escribirNodoRecursivo(arbol%raiz, fileUnit)
@@ -148,6 +149,7 @@ contains
         write(fileunit,*) '}'
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
+        print *,"Arbol de Capas graficado con exito" 
         call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficarABB
 

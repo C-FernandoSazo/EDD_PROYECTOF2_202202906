@@ -355,6 +355,7 @@ contains
         close(fileUnit)
     
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
+        print *,"Matriz Dispersa graficada con exito"
         call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficarMatrizDispersa
 
@@ -406,100 +407,58 @@ contains
         self%ancho = 0
     end subroutine vaciarMatriz
 
-    subroutine generarImagen(self)
-        class(matrizDispersa), intent(inout) :: self  
-        character(len=18) :: filename = "imagenGenerada"
-        integer :: i, j, fileUnit, iostat
-        type(nodo_matriz), pointer :: aux
+    subroutine generarImagen(this)
+        class(matrizDispersa), intent(in) :: this
+        character(len=23) :: filename = "img/ImagenGenerada.html"
+        integer :: unit
+        integer :: j, i
         type(nodovalor) :: val
-        character(len=256) :: dotPath, pngPath
-        aux => self%head%down
-
-        dotPath = 'dot/' // trim(filename) // '.dot'
-        pngPath = 'img/' // trim(adjustl(filename))
-
-        print *,"Generando imagen..."
-        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
-        if (iostat /= 0) then
-            print *, "Error al abrir el archivo."
-            return
-        end if
-
-        write(fileUnit, *) "graph matriz {"
-        write(fileUnit, *) "    node [shape=box, style=filled, color=white];"
-
-        write(fileUnit,'(A)') '"Origen" [label="-1", group = 1]'
-
-        !Generacion de encabezados de cada columna
-        do j=0, self%ancho
-            write(fileUnit,'(A,I0,A,I0,A,I0,A)') '"Col', j, '"[label="', j, '", group =', j+2, ']'
-            if (.not. j == 0) then
-            if (j /= self%ancho) then
-                write(fileUnit,'(A,I0,A,I0,A)') '"Col', j, '" --  "Col', j+1, '" [color=white];'
-            end if
-            else
-                write(fileUnit,'(A,I0,A,I0,A)') '"Origen" --  "Col', j, '" [color=white];'
-                write(fileUnit,'(A,I0,A,I0,A)') '"Col', j, '" --  "Col', j+1, '" [color=white];'
-            end if
+        open(unit, file=filename, status='replace')
+        write(unit, '(A)') '<!DOCTYPE html>'
+        write(unit, '(A)') '<html>'
+        write(unit, '(A)') '<head>'
+        write(unit, '(A)') '<style>'
+        write(unit, '(A)') 'table {'
+        write(unit, '(A)') '  border-collapse: collapse;'
+        write(unit, '(A)') '  width: 100%;'
+        write(unit, '(A)') '}'
+        write(unit, '(A)') 'th, td {'
+        write(unit, '(A)') '  border: none;'  
+        write(unit, '(A)') '  text-align: center;'
+        write(unit, '(A)') '  padding: 8px;'
+        write(unit, '(A)') '}'
+        write(unit, '(A)') 'th {'
+        write(unit, '(A)') '  background-color: #f2f2f2;'
+        write(unit, '(A)') '}'
+        write(unit, '(A)') '</style>'
+        write(unit, '(A)') '</head>'
+        write(unit, '(A)') '<body>'
+        write(unit, '(A)') '<table>'
+        write(unit, '(A)') '  <tr>'
+        write(unit, '(A)') '    <th></th>'
+        do j=0, this%ancho
+            write(unit, '(A,I0,A)', advance='no') '    <th>', j, '</th>'   
         end do
-
-        write(fileUnit, *) ' { rank=same; "Origen";'
-
-        do j=0, self%ancho
-            write(fileUnit, '(A,I0,A)', advance='no') ' "Col', j, '";'
-        end do
-
-        write(fileUnit, *) " }"
-
-        ! Generacion de encabezados de cada Fila
-        do i=0, self%largo
-            write(fileUnit,'(A,I0,A,I0,A)') '"Fil', i, '"[label="', i, '", group = 1]'
-            if (.not. i == 0) then
-            if (i /= self%largo) then
-                write(fileUnit,'(A,I0,A,I0,A)') '"Fil', i, '" --  "Fil', i+1, '" [color=white];'
-            end if
-            else
-                write(fileUnit,'(A,I0,A,I0,A)') '"Origen" --  "Fil', i, '" [color=white];'
-                write(fileUnit,'(A,I0,A,I0,A)') '"Fil', i, '" --  "Fil', i+1, '" [color=white];'
-            end if
-        end do
-
-        do i = 0, self%largo
-            do j = 0, self%ancho
-                val = self%getValor(i,j)
+        write(unit, '(A)') '  </tr>'
+        do i = 0, this%largo
+            write(unit, '(A)') '  <tr>'
+            write(unit, '(A,I0,A)', advance='no') '    <th>', i, '</th>'
+            do j = 0, this%ancho
+                val = this%getValor(i,j)
                 if(.not. val%existe) then
-                    write(fileUnit,'(A,I0,A,I0,A,I0,A)') '"F',i, 'C', j, '" [label=" ", group=',  j+2,']'
+                    write(unit, '(A)') '    <td></td>'
                 else
-                    write(fileUnit, '(A,I0,A,I0,A,A,A)') '"F',i, 'C', j, '" [label=" ", style=filled, fillcolor="', &
-                    val%valor, '"]'
+                    write(unit, '(A)') '    <td style="background-color:', trim(val%valor), '"></td>'
                 end if
-                if (i == 0 .and. j == 0) then
-                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Fil', i, '" -- ', '"F',i, 'C', j, '" [color=white];'
-                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Col', j, '" -- ', '"F',i, 'C', j, '" [color=white];'
-                else if (i == 0) then
-                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Col', j, '" -- ', '"F',i, 'C', j, '" [color=white];'
-                else if (j == 0) then
-                    write(fileUnit,'(A,I0,A,A,I0,A,I0,A)') '"Fil', i, '" -- ', '"F',i, 'C', j, '" [color=white];'
-                end if 
-                if (j /= self%ancho) write(fileUnit,'(A,I0,A,I0,A,A,I0,A,I0,A)') '"F',i, 'C', j, '" -- ' , '"F',i, 'C', j+1, &
-                '" [color=white];'
-                if (i /= self%largo) write(fileUnit,'(A,I0,A,I0,A,A,I0,A,I0,A)') '"F',i, 'C', j, '" -- ', '"F',i+1, 'C', j, &
-                '" [color=white];'
             end do
-
-            write(fileUnit, '(A,I0,A)') ' { rank=same; "Fil', i, '";'
-            do j=0, self%ancho
-                write(fileUnit, '(A,I0,A,I0,A)', advance='no') '"F',i, 'C', j, '";'
-            end do
-            write(fileUnit, *) "}"
+            write(unit, '(A)') '  </tr>'
         end do
-
-        write(fileUnit, *) "}"
-        close(fileUnit)
-    
-        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
-        call system('start ' // trim(adjustl(pngPath)) // '.png')
-    end subroutine generarImagen
-
+        write(unit, '(A)') '</table>'
+        write(unit, '(A)') '</body>'
+        write(unit, '(A)') '</html>'
+        close(unit)
+        print *,"Imagen generada con exito"
+        call SYSTEM("start " // trim(filename))
+    end subroutine generarImagen    
 
 end module matriz_DispersaI

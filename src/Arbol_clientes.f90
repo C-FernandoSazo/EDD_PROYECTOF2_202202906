@@ -359,6 +359,7 @@ contains
             return
         end if
 
+        print *,"Generando Arbol de Clientes..."
         write(fileUnit, *) "graph clientes {"
         write(fileUnit, *) "    node [shape=record];"
     
@@ -370,6 +371,7 @@ contains
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
         call system('start ' // trim(adjustl(pngPath)) // '.png')
+        print *,"Arbol de Clientes graficado con exito"
     end subroutine graficarB
     
     recursive subroutine escribirNodoYConexionesRecursivo(unitNum, nodo)
