@@ -167,7 +167,8 @@ contains
         end if
         write(fileunit,*) '}'
         close(fileUnit)
-        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')     
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')    
+        call system('start ' // trim(adjustl(pngPath)) // '.png') 
     end subroutine graficarAVL
 
     recursive subroutine escribirNodoRecursivos(nodo, unitNum)
@@ -215,6 +216,7 @@ contains
         write(fileunit,*) '}'
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')     
+        call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficarAVL_BB
 
     recursive subroutine escribirRecursivo(nodo, unitNum, key)

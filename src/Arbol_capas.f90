@@ -148,6 +148,7 @@ contains
         write(fileunit,*) '}'
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
+        call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficarABB
 
     subroutine escribirABB(arbol,fileUnit)

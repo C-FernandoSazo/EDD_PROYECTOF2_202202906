@@ -4,6 +4,4 @@
 1[label="Imagen 1"]
            5  ->            6
 6[label="Imagen 6"]
-           6  ->            9
-9[label="Imagen 9"]
  }

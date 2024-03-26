@@ -142,6 +142,7 @@ contains
         close(fileUnit)
         call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
         print *, 'Graphviz file generated: ', trim(adjustl(filename)) // '.png'
+        call system('start ' // trim(adjustl(pngPath)) // '.png')
     end subroutine graficar_albums
 
     subroutine conteoAlbumImg(lista)
