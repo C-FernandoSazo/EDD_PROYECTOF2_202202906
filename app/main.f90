@@ -47,8 +47,7 @@ program main
             read (*,*) opcionAdmin
             select case(opcionAdmin)
               case(1)
-                print *, "Imprimiendo estructura:"
-                call miArbolClientes%traversal(miArbolClientes%root)
+                call miArbolClientes%graficarB()
               case(2)
                 do
                   print *, "1. Insertar Usuario"

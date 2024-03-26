@@ -141,7 +141,7 @@ contains
             return
         end if
 
-        write(fileUnit, *) "digraph capas {"
+        write(fileUnit, *) "graph capas {"
         if (associated(arbol%raiz)) then
             call escribirNodoRecursivo(arbol%raiz, fileUnit)
         end if
@@ -173,12 +173,12 @@ contains
         write(unitNum,'(A,I0,A,I0,A)') '"Capa',nodo%capa%key, '" [label="Capa ', nodo%capa%key, '"]'
         ! Escribe la arista al hijo izquierdo si existe
         if (associated(nodo%left)) then
-            write(unitNum,'(A,I0,A,I0,A)') '"Capa', nodo%capa%key, '" -> "Capa', nodo%left%capa%key,'"'
+            write(unitNum,'(A,I0,A,I0,A)') '"Capa', nodo%capa%key, '" -- "Capa', nodo%left%capa%key,'"'
             call escribirNodoRecursivo(nodo%left, unitNum)
         end if
         ! Escribe la arista al hijo derecho si existe
         if (associated(nodo%right)) then
-            write(unitNum,'(A,I0,A,I0,A)') '"Capa', nodo%capa%key, '" -> "Capa', nodo%right%capa%key,'"'
+            write(unitNum,'(A,I0,A,I0,A)') '"Capa', nodo%capa%key, '" -- "Capa', nodo%right%capa%key,'"'
             call escribirNodoRecursivo(nodo%right, unitNum)
         end if
     end subroutine escribirNodoRecursivo

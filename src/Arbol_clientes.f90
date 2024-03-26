@@ -40,6 +40,7 @@ module Arbol_clientes
             procedure :: modificarCliente
             procedure :: actualizarEstructuras
             procedure :: buscarID
+            procedure :: graficarB
     end type ArbolClientes
 
 contains
@@ -342,6 +343,68 @@ contains
             call buscarRecursivoID(nodo%link(i)%ptr, id, clienteEncontrado)
         end do
     end subroutine buscarRecursivoID
+
+    subroutine graficarB(arbol)
+        class(ArbolClientes), intent(in) :: arbol
+        character(len=13) :: filename = "arbolClientes"
+        integer :: fileUnit, iostat
+        character(len=256) :: dotPath, pngPath
+
+        dotPath = 'dot/' // trim(filename) // '.dot'
+        pngPath = 'img/' // trim(adjustl(filename))
+
+        open(newunit=fileUnit, file=dotPath, status='replace', iostat=iostat)
+        if (iostat /= 0) then
+            print *, "Error al abrir el archivo."
+            return
+        end if
+
+        write(fileUnit, *) "graph clientes {"
+        write(fileUnit, *) "    node [shape=record];"
     
+        if (associated(arbol%root)) then
+            call escribirNodoYConexionesRecursivo(fileUnit, arbol%root)
+        end if
+
+        write(fileunit,*) '}'
+        close(fileUnit)
+        call system('dot -Tpng ' // trim(dotPath) // ' -o ' // trim(adjustl(pngPath)) // '.png')   
+        call system('start ' // trim(adjustl(pngPath)) // '.png')
+    end subroutine graficarB
     
+    recursive subroutine escribirNodoYConexionesRecursivo(unitNum, nodo)
+        integer, intent(in) :: unitNum
+        type(BTreeNode), pointer, intent(in) :: nodo
+        integer :: i
+
+        if (.not. associated(nodo)) then
+            return
+        end if
+
+        write(unitNum,'(A,I0,A,A,A)') '"Cliente', nodo%cliente(1)%id, '" [label="', trim(nodoLabel(nodo)), '"]'
+
+        ! Escribe las aristas a los nodos hijos
+        do i = 0, nodo%num
+            if (associated(nodo%link(i)%ptr)) then
+                ! Asume que el primer cliente del nodo hijo es representativo para la conexión
+                write(unitNum,'(A,I0,A,I0,A)') '"Cliente', nodo%cliente(1)%id, '" -- "Cliente', nodo%link(i)%ptr%cliente(1)%id,'"'
+                call escribirNodoYConexionesRecursivo(unitNum, nodo%link(i)%ptr)
+            end if
+        end do
+    end subroutine escribirNodoYConexionesRecursivo
+    
+    function nodoLabel(nodo) result(etiqueta)
+        type(BTreeNode), pointer, intent(in) :: nodo
+        character(len=256) :: etiquetaTemp
+        character(len=:), allocatable :: etiqueta
+        integer :: i
+    
+        ! Agrega la información de cada cliente en el nodo
+        do i = 1, nodo%num
+            write(etiquetaTemp, '(A, I0, A, A, A, I0)') "Cliente ", nodo%cliente(i)%id, ": ", trim(nodo%cliente(i)%nombre), &
+            " DPI: ", nodo%cliente(i)%dpi
+            etiqueta = etiqueta // trim(adjustl(etiquetaTemp)) // "\n"
+        end do
+    end function nodoLabel
+
 end module Arbol_clientes

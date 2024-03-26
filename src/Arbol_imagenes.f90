@@ -161,7 +161,7 @@ contains
             return
         end if
 
-        write(fileUnit, *) "digraph imagenes {"
+        write(fileUnit, *) "graph imagenes {"
         if (associated(arbol%raiz)) then
             call escribirNodoRecursivos(arbol%raiz, fileUnit)
         end if
@@ -181,12 +181,12 @@ contains
         write(unitNum,'(I0,A,I0,A)') nodo%id, '[label="Imagen ', nodo%id, '"]'
         ! Escribe la arista al hijo izquierdo si existe
         if (associated(nodo%left)) then
-            write(unitNum,*) nodo%id, ' -> ', nodo%left%id
+            write(unitNum,*) nodo%id, ' -- ', nodo%left%id
             call escribirNodoRecursivos(nodo%left, unitNum)
         end if
         ! Escribe la arista al hijo derecho si existe
         if (associated(nodo%right)) then
-            write(unitNum,*) nodo%id, ' -> ', nodo%right%id
+            write(unitNum,*) nodo%id, ' -- ', nodo%right%id
             call escribirNodoRecursivos(nodo%right, unitNum)
         end if
     end subroutine escribirNodoRecursivos
@@ -209,7 +209,7 @@ contains
             return
         end if
 
-        write(fileUnit, *) "digraph ALV_BB {"
+        write(fileUnit, *) "graph ALV_BB {"
         if (associated(arbol%raiz)) then
             call escribirRecursivo(arbol%raiz, fileUnit,key)
         end if
@@ -232,15 +232,15 @@ contains
         if (nodo%id == key) then
             rootCapa = nodo%arbolCapa%getRaiz()
             call nodo%arbolCapa%escribirABB(unitNum)
-            write(unitNum,'(I0,A,I0,A)') nodo%id, ' -> "Capa', rootCapa,'" [color=red];'
+            write(unitNum,'(I0,A,I0,A)') nodo%id, ' -- "Capa', rootCapa,'" [color=red];'
         end if
         if (associated(nodo%left)) then
-            write(unitNum,*) nodo%id, ' -> ', nodo%left%id
+            write(unitNum,*) nodo%id, ' -- ', nodo%left%id
             call escribirRecursivo(nodo%left, unitNum, key)
         end if
         ! Escribe la arista al hijo derecho si existe
         if (associated(nodo%right)) then
-            write(unitNum,*) nodo%id, ' -> ', nodo%right%id
+            write(unitNum,*) nodo%id, ' -- ', nodo%right%id
             call escribirRecursivo(nodo%right, unitNum, key)
         end if
     end subroutine escribirRecursivo
