@@ -47,7 +47,8 @@ program main
             read (*,*) opcionAdmin
             select case(opcionAdmin)
               case(1)
-      
+                print *, "Imprimiendo estructura:"
+                call miArbolClientes%traversal(miArbolClientes%root)
               case(2)
                 do
                   print *, "1. Insertar Usuario"
@@ -97,7 +98,7 @@ program main
                     read(*,*) opcionOPClient
                     clienteSearch = miArbolClientes%buscarID(opcionOPClient)
                     if (clienteSearch%nombre /= "0") then
-                      print *,"Imprimiendo información del usuario: "
+                      print *,"Imprimiendo informacion del usuario: "
                       write(*,'(A,A,A,I0,A,A)')'Nombre: ',clienteSearch%nombre, ' DPI: ', clienteSearch%dpi, ' Password: ', &
                       clienteSearch%password
                       call clienteSearch%miListaAlbum%conteoAlbumImg()
